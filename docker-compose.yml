@@ -1,0 +1,46 @@
+services:
+  proyecto-db:
+    image: postgres:17.0
+    container_name: proyectoFinalModulo
+    restart: always
+    environment:
+      POSTGRES_DB: proyectoFinal
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    networks:
+      - proyecto-network
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  proyecto-backend:
+    build: .
+    container_name: proyecto-backend
+    restart: always
+    depends_on:
+      - proyecto-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://proyecto-db:5432/proyectoFinal
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    ports:
+      - "8091:8091"
+    networks:
+      - proyecto-network
+
+  proyecto-frontend:
+    build:
+      context: ./frontend/www/html/frontend-proyecto
+    container_name: proyecto-frontend
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - proyecto-network
+
+networks:
+  proyecto-network:
+
+volumes:
+  db_data:
