@@ -23,7 +23,5 @@ public class NuevoUsuario {
     private String email;
     @NotBlank
     private String password;
-    //Al utilizar API Rest utilizamos objetos tipo Json y
-    //es mejor que sean cadenas para agilizar el trafico
-    private Set<String> roles = new HashSet<>();
+
 }

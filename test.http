@@ -1,0 +1,129 @@
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "hrisi2",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristsiyantg@gmail.com",
+    "password": "Hrisi231104!"
+}
+###
+## login ok PERMISOS ROLE_ADMIN
+POST http://localhost:8091/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "hrisi2",
+    "password": "Hrisi231104!"
+}
+
+###
+## Crear gasto (asegúrate de usar enums válidos en tipoGasto y subtipo)
+POST http://localhost:8091/api/gastos HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDQxNDEwNTksImV4cCI6MTc0NDE3NzA1OX0.Yyc_dCpGE2xMGdoAYD2rAMHOq7vnn6O4RrnTqDYPi-U
+
+{
+  "usuario": { "id": 1 },
+  "grupo": { "id": 1 },
+  "tipoGasto": "LUJO",
+  "subtipo": "RESTAURANTES",
+  "cantidad": 100.50,
+  "fecha": "2025-04-06"
+}
+###
+## Obtener gasto por ID
+GET http://localhost:8091/api/gastos/1 HTTP/1.1
+Authorization: Bearer {{TOKEN}}
+
+###
+## Actualizar gasto
+PUT http://localhost:8091/api/gastos/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{TOKEN}}
+
+{
+  "usuario": { "id": 1 },
+  "grupo": { "id": 1 },
+  "tipoGasto": "SUPERVIVENCIA",
+  "subtipo": "COMIDA",
+  "cantidad": 75.00,
+  "fecha": "2025-04-07"
+}
+###
+## Eliminar gasto
+DELETE http://localhost:8091/api/gastos/1 HTTP/1.1
+Authorization: Bearer {{TOKEN}}
+
+
+
+
+###
+## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
+POST http://localhost:8091/api/grupos HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDQxNDE3NTAsImV4cCI6MTc0NDE3Nzc1MH0.7ykjGNBYZlg6bcd2HL4YjzyYRhvACpaaGR2QFVAAv6U
+
+{
+  "nombre": "Familia Trayanov"
+}
+###
+## Obtener grupo por ID
+GET http://localhost:8091/api/grupo-familiar/1 HTTP/1.1
+Authorization: Bearer {{TOKEN}}
+
+###
+## Actualizar grupo (solo el administrador puede)
+PUT http://localhost:8091/api/grupo-familiar/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{TOKEN}}
+
+{
+  "nombre": "Familia Trayanov Actualizado"
+}
+###
+## Eliminar grupo
+DELETE http://localhost:8091/api/grupo-familiar/1 HTTP/1.1
+Authorization: Bearer {{TOKEN}}
+
+
+
+###
+## Crear mensaje
+POST http://localhost:8091/api/mensajes HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{TOKEN}}
+
+{
+  "emisor": { "id": 1 },
+  "receptor": { "id": 2 },
+  "grupo": { "id": 1 },
+  "contenido": "Hola, este es un mensaje de prueba",
+  "fecha": "2025-04-06T18:00:00",
+  "tipo": "PRIVADO"
+}
+###
+## Obtener mensaje por ID
+GET http://localhost:8091/api/mensajes/1 HTTP/1.1
+Authorization: Bearer {{TOKEN}}
+
+###
+## Actualizar mensaje
+PUT http://localhost:8091/api/mensajes/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{TOKEN}}
+
+{
+  "emisor": { "id": 1 },
+  "receptor": { "id": 2 },
+  "grupo": { "id": 1 },
+  "contenido": "Mensaje editado",
+  "fecha": "2025-04-06T18:30:00",
+  "tipo": "PRIVADO"
+}
+###
+## Eliminar mensaje
+DELETE http://localhost:8091/api/mensajes/1 HTTP/1.1
+Authorization: Bearer {{TOKEN}}

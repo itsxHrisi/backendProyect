@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 import proyect.proyectefinal.model.db.RolDb;
 import proyect.proyectefinal.model.db.UsuarioDb;
 import proyect.proyectefinal.model.dto.LoginUsuario;
-import proyect.proyectefinal.model.dto.Mensaje;
+import proyect.proyectefinal.model.dto.MensajeText;
 import proyect.proyectefinal.model.enums.RolNombre;
 import proyect.proyectefinal.security.dto.JwtDto;
 import proyect.proyectefinal.security.dto.NuevoUsuario;
@@ -54,31 +54,35 @@ public class AuthController {
     @Autowired
     JwtService jwtProvider;
 
-    
     @PostMapping("/nuevo")
-    public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
-        if(bindingResult.hasErrors())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Mensaje("Datos incorrectos o email inválido"));
-        if(usuarioService.existsByNickname(nuevoUsuario.getNickname()))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Mensaje("El nickname del usuario ya existe"));
-        if(usuarioService.existsByEmail(nuevoUsuario.getEmail()))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Mensaje("El email del usuario ya existe"));
-        UsuarioDb usuarioDb =
-                new UsuarioDb(nuevoUsuario.getNombre(), nuevoUsuario.getNickname(), nuevoUsuario.getEmail(),
-                        passwordEncoder.encode(nuevoUsuario.getPassword()));
-        Set<RolDb> rolesDb = new HashSet<>();
-        rolesDb.add(rolService.getByRolNombre(RolNombre.ROL_USER).get());
-        if(nuevoUsuario.getRoles().contains("ROL_ADMIN")) 
-            rolesDb.add(rolService.getByRolNombre(RolNombre.ROL_ADMIN).get());
-        usuarioDb.setRoles(rolesDb);
-        usuarioService.save(usuarioDb);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new Mensaje("Usuario creado"));
-    }
+public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult) {
+    if (bindingResult.hasErrors())
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MensajeText("Datos incorrectos o email inválido"));
+    if (usuarioService.existsByNickname(nuevoUsuario.getNickname()))
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MensajeText("El nickname del usuario ya existe"));
+    if (usuarioService.existsByEmail(nuevoUsuario.getEmail()))
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MensajeText("El email del usuario ya existe"));
+
+    UsuarioDb usuarioDb = new UsuarioDb(
+        nuevoUsuario.getNombre(),
+        nuevoUsuario.getNickname(),
+        nuevoUsuario.getEmail(),
+        passwordEncoder.encode(nuevoUsuario.getPassword())
+    );
+
+    Set<RolDb> rolesDb = new HashSet<>();
+    rolesDb.add(rolService.getByRolNombre(RolNombre.ROL_USER).orElseThrow());
+    usuarioDb.setRoles(rolesDb);
+
+    usuarioService.save(usuarioDb);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new MensajeText("Usuario creado"));
+}
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult){
         if(bindingResult.hasErrors())
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Mensaje("Datos incorrectos"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MensajeText("Datos incorrectos"));
         Authentication authentication =
                 authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginUsuario.getNickname(), loginUsuario.getPassword()));
