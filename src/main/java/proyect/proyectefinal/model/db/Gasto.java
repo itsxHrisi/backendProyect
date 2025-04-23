@@ -27,8 +27,10 @@ public class Gasto {
     @ManyToOne
     private GrupoFamiliar grupo;
 
+    @Column(name = "tipo_gasto", nullable = false)
     private String tipoGasto;
-
+    
+    @Column(name = "subtipo", nullable = false)
     private String subtipo;
 
     private Long cantidad;

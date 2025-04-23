@@ -8,8 +8,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import proyect.proyectefinal.model.db.GrupoFamiliar;
+import proyect.proyectefinal.model.db.RolDb;
 import proyect.proyectefinal.model.db.UsuarioDb;
+import proyect.proyectefinal.model.enums.RolNombre;
 import proyect.proyectefinal.repository.GrupoFamiliarRepository;
+import proyect.proyectefinal.repository.RolRepository;
 import proyect.proyectefinal.security.service.UsuarioService;
 import proyect.proyectefinal.service.GrupoFamiliarService;
 
@@ -27,7 +30,8 @@ public class GrupoFamiliarController {
     private GrupoFamiliarRepository grupoFamiliarRepository;
     @Autowired
     private UsuarioService usuarioService;
-
+    @Autowired
+    private RolRepository rolRepository;
     @GetMapping
     public List<GrupoFamiliar> getAll() {
         return grupoFamiliarService.findAll();
@@ -42,27 +46,52 @@ public class GrupoFamiliarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Grupo familiar no encontrado");
         }
     }
+@PostMapping
+public ResponseEntity<?> createGrupoFamiliar(@RequestBody GrupoFamiliar grupoFamiliar) {
+    // Obtener el usuario autenticado
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String nickname = auth.getName();
+    UsuarioDb usuario = usuarioService.getByNickname(nickname)
+            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-    @PostMapping
-    public ResponseEntity<?> createGrupoFamiliar(@RequestBody GrupoFamiliar grupoFamiliar) {
-        // Obtener el usuario autenticado
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String nickname = auth.getName();
-        UsuarioDb usuario = usuarioService.getByNickname(nickname).orElseThrow(
-                () -> new UsernameNotFoundException("Usuario no encontrado"));
+    // Asignar administrador
+    grupoFamiliar.setAdministrador(usuario);
+    GrupoFamiliar grupoGuardado = grupoFamiliarService.save(grupoFamiliar);
 
-        // Asignar administrador
-        grupoFamiliar.setAdministrador(usuario);
+    // Asignar grupo al usuario
+    usuario.setGrupoFamiliar(grupoGuardado);
 
-        // Guardar grupo
-        GrupoFamiliar grupoGuardado = grupoFamiliarService.save(grupoFamiliar);
+    // Asignar rol ROL_ADMIN
+    RolDb rolAdmin = rolRepository.findByNombre(RolNombre.ROL_ADMIN)
+            .orElseThrow(() -> new RuntimeException("Rol ROL_ADMIN no encontrado"));
+    usuario.getRoles().add(rolAdmin);
 
-        // Asignar grupo al usuario
-        usuario.setGrupoFamiliar(grupoGuardado);
-        usuarioService.save(usuario);
+    // Guardar usuario actualizado
+    usuarioService.save(usuario);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(grupoGuardado);
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(grupoGuardado);
+}
+
+    // @PostMapping
+    // public ResponseEntity<?> createGrupoFamiliar(@RequestBody GrupoFamiliar grupoFamiliar) {
+    //     // Obtener el usuario autenticado
+    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    //     String nickname = auth.getName();
+    //     UsuarioDb usuario = usuarioService.getByNickname(nickname).orElseThrow(
+    //             () -> new UsernameNotFoundException("Usuario no encontrado"));
+
+    //     // Asignar administrador
+    //     grupoFamiliar.setAdministrador(usuario);
+
+    //     // Guardar grupo
+    //     GrupoFamiliar grupoGuardado = grupoFamiliarService.save(grupoFamiliar);
+
+    //     // Asignar grupo al usuario
+    //     usuario.setGrupoFamiliar(grupoGuardado);
+    //     usuarioService.save(usuario);
+
+    //     return ResponseEntity.status(HttpStatus.CREATED).body(grupoGuardado);
+    // }
 
     // @PostMapping("/nuevo")
     // public ResponseEntity<GrupoFamiliar> create(@RequestBody GrupoFamiliar grupo) {

@@ -10,6 +10,17 @@ Content-Type: application/json
     "password": "Hrisi231104!"
 }
 ###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "sofia2",
+    "nombre": "sofia\nTrayanova",
+    "email": "sofiatg@gmail.com",
+    "password": "Sofia230512!"
+}
+###
 ## login ok PERMISOS ROLE_ADMIN
 POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
@@ -23,26 +34,26 @@ Content-Type: application/json
 ## Crear gasto (asegúrate de usar enums válidos en tipoGasto y subtipo)
 POST http://localhost:8091/api/gastos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDQxNDEwNTksImV4cCI6MTc0NDE3NzA1OX0.Yyc_dCpGE2xMGdoAYD2rAMHOq7vnn6O4RrnTqDYPi-U
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyNTc1MTgsImV4cCI6MTc0NTI5MzUxOH0.68KBlr8CwrklAz-6ftojIvWWYMYrv5BSYQj53XZ216A
 
 {
   "usuario": { "id": 1 },
   "grupo": { "id": 1 },
   "tipoGasto": "LUJO",
-  "subtipo": "RESTAURANTES",
+  "subtipo": "ESPECTACULOS",
   "cantidad": 100.50,
   "fecha": "2025-04-06"
 }
 ###
 ## Obtener gasto por ID
-GET http://localhost:8091/api/gastos/1 HTTP/1.1
-Authorization: Bearer {{TOKEN}}
+GET http://localhost:8091/api/gastos/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyNTc1MTgsImV4cCI6MTc0NTI5MzUxOH0.68KBlr8CwrklAz-6ftojIvWWYMYrv5BSYQj53XZ216A
 
 ###
 ## Actualizar gasto
-PUT http://localhost:8091/api/gastos/1 HTTP/1.1
+PUT http://localhost:8091/api/gastos/2 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{TOKEN}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyNTc1MTgsImV4cCI6MTc0NTI5MzUxOH0.68KBlr8CwrklAz-6ftojIvWWYMYrv5BSYQj53XZ216A
 
 {
   "usuario": { "id": 1 },
@@ -54,8 +65,8 @@ Authorization: Bearer {{TOKEN}}
 }
 ###
 ## Eliminar gasto
-DELETE http://localhost:8091/api/gastos/1 HTTP/1.1
-Authorization: Bearer {{TOKEN}}
+DELETE http://localhost:8091/api/gastos/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzNDI2NTcsImV4cCI6MTc0NTM3ODY1N30.rVvwNwyObe9AjRAtI0XQbxgcGdvigEZalVD4TdDmw4g
 
 
 
@@ -64,29 +75,29 @@ Authorization: Bearer {{TOKEN}}
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDQxNDE3NTAsImV4cCI6MTc0NDE3Nzc1MH0.7ykjGNBYZlg6bcd2HL4YjzyYRhvACpaaGR2QFVAAv6U
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzNDQyNzMsImV4cCI6MTc0NTM4MDI3M30.2qjMH1sutwbV3toHZgohd1wBgS9wsn3ok1fBo74hoNw
 
 {
   "nombre": "Familia Trayanov"
 }
 ###
 ## Obtener grupo por ID
-GET http://localhost:8091/api/grupo-familiar/1 HTTP/1.1
-Authorization: Bearer {{TOKEN}}
+GET http://localhost:8091/api/grupos/1 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0MjkyMDIsImV4cCI6MTc0NTQ2NTIwMn0.h1ap4ND-a2VFq_RcCl0MCPbXNciutXmEdQcbMsSXhlo
 
 ###
 ## Actualizar grupo (solo el administrador puede)
-PUT http://localhost:8091/api/grupo-familiar/1 HTTP/1.1
+PUT http://localhost:8091/api/grupos/1 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{TOKEN}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzNDI2NTcsImV4cCI6MTc0NTM3ODY1N30.rVvwNwyObe9AjRAtI0XQbxgcGdvigEZalVD4TdDmw4g
 
 {
   "nombre": "Familia Trayanov Actualizado"
 }
 ###
 ## Eliminar grupo
-DELETE http://localhost:8091/api/grupo-familiar/1 HTTP/1.1
-Authorization: Bearer {{TOKEN}}
+DELETE http://localhost:8091/api/grupos/1 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyNTc1MTgsImV4cCI6MTc0NTI5MzUxOH0.68KBlr8CwrklAz-6ftojIvWWYMYrv5BSYQj53XZ216A
 
 
 
@@ -94,7 +105,7 @@ Authorization: Bearer {{TOKEN}}
 ## Crear mensaje
 POST http://localhost:8091/api/mensajes HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer {{TOKEN}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzNDY0MzcsImV4cCI6MTc0NTM4MjQzN30.bZ14JlgtXbR8VCeepiFHO9qjNNV24nUQAdVB8jFu8_8
 
 {
   "emisor": { "id": 1 },
@@ -127,3 +138,24 @@ Authorization: Bearer {{TOKEN}}
 ## Eliminar mensaje
 DELETE http://localhost:8091/api/mensajes/1 HTTP/1.1
 Authorization: Bearer {{TOKEN}}
+
+###
+### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
+POST http://localhost:8091/api/invitaciones HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0MzQwODUsImV4cCI6MTc0NTQ3MDA4NX0.f7rGD9g0FCJfNGigz1H9aYVTQxwpZCLrebd0u97zLso
+
+{
+  "nickname": "sofia2",
+  "grupoId": 1
+}
+
+###
+### Obtener invitaciones del grupo con ID 1
+GET http://localhost:8091/api/invitaciones/grupo/1 HTTP/1.1
+Authorization: Bearer {{tu_token_aqui}}
+
+###
+### Marcar invitación con ID 5 como aceptada
+PUT http://localhost:8091/api/invitaciones/5/estado?nuevoEstado=ACEPTADA HTTP/1.1
+Authorization: Bearer {{tu_token_aqui}}

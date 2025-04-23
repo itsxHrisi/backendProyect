@@ -9,24 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class GrupoFamiliarService {
+public interface GrupoFamiliarService {
+    public List<GrupoFamiliar> findAll();
+    public Optional<GrupoFamiliar> findById(Long id);
 
-    @Autowired
-    private GrupoFamiliarRepository grupoFamiliarRepository;
-
-    public List<GrupoFamiliar> findAll() {
-        return grupoFamiliarRepository.findAll();
-    }
-
-    public Optional<GrupoFamiliar> findById(Long id) {
-        return grupoFamiliarRepository.findById(id);
-    }
-
-    public GrupoFamiliar save(GrupoFamiliar grupo) {
-        return grupoFamiliarRepository.save(grupo);
-    }
-
-    public void deleteById(Long id) {
-        grupoFamiliarRepository.deleteById(id);
-    }
+    public GrupoFamiliar save(GrupoFamiliar grupo);
+    public void deleteById(Long id);
 }
