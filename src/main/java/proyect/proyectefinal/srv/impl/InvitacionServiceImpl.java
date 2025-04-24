@@ -15,6 +15,7 @@ import proyect.proyectefinal.repository.InvitacionRepository;
 import proyect.proyectefinal.repository.UsuarioRepository;
 import proyect.proyectefinal.service.InvitacionService;
 import proyect.proyectefinal.srv.mapper.InvitacionMapper;
+
 @Service
 public class InvitacionServiceImpl implements InvitacionService {
 
@@ -34,21 +35,32 @@ public class InvitacionServiceImpl implements InvitacionService {
 
     @Override
     public Invitacion crearInvitacion(InvitacionRequest request) {
-        // 1. Buscar usuario por nickname
+        // 1. Validar nickname
+        if (request.getNickname() == null || request.getNickname().isBlank()) {
+            throw new RuntimeException("El nickname de destino no puede estar vacío");
+        }
+    
+        // 2. Buscar usuario por nickname
         UsuarioDb usuarioDestino = usuarioRepository.findByNickname(request.getNickname())
-                .orElseThrow(() -> new RuntimeException("Este usuario no existe"));
+                .orElseThrow(() -> new RuntimeException("Este usuario no existe: " + request.getNickname()));
+                System.out.println("Nickname destino: " + usuarioDestino.getNickname());
 
-        // 2. Buscar grupo
+        if (usuarioDestino.getNickname() == null || usuarioDestino.getNickname().isBlank()) {
+            throw new RuntimeException("El usuario encontrado no tiene nickname asignado");
+        }
+    
+        // 3. Buscar grupo
         GrupoFamiliar grupo = grupoFamiliarRepository.findById(request.getGrupoId())
-                .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
-
-        // 3. Crear invitación
+                .orElseThrow(() -> new RuntimeException("Grupo no encontrado con ID: " + request.getGrupoId()));
+    
+        // 4. Crear invitación
         Invitacion invitacion = new Invitacion();
-        invitacion.setNicknameDestino(usuarioDestino.getEmail()); // Aunque no uses el email para enviar, sigue siendo identificativo
+        invitacion.setNicknameDestino(usuarioDestino.getNickname());
         invitacion.setGrupo(grupo);
         invitacion.setEstado(Invitacion.EstadoInvitacion.PENDIENTE);
         invitacion.setFechaEnvio(LocalDateTime.now());
-
+        System.out.println("Fecha de envío: " + invitacion.getFechaEnvio());
+    
         return invitacionRepository.save(invitacion);
     }
 

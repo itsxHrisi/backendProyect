@@ -1,6 +1,5 @@
 package proyect.proyectefinal.model.db;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +19,7 @@ public class Invitacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "nickname_destino", nullable = false)
     private String nicknameDestino;
 
     @ManyToOne
@@ -29,6 +29,7 @@ public class Invitacion {
     @Enumerated(EnumType.STRING)
     private EstadoInvitacion estado;
 
+    @Column(name = "fecha_envio", nullable = false)
     private LocalDateTime fechaEnvio;
 
     // Getters y setters

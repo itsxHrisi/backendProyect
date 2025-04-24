@@ -3,6 +3,7 @@ package proyect.proyectefinal.srv.mapper;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
@@ -20,7 +21,10 @@ public interface InvitacionMapper {
     InvitacionEdit invitacionToInvitacionEdit(Invitacion entity);
 
     InvitacionInfo invitacionToInvitacionInfo(Invitacion entity);
+
+    @Mapping(source = "nickname", target = "nicknameDestino")
     Invitacion invitacionRequestToInvitacion(InvitacionRequest invitacion);
+    
     void updateInvitacionFromEdit(InvitacionEdit dto, @MappingTarget Invitacion entity);
 
     List<InvitacionInfo> invitacionesToInvitacionInfoList(List<Invitacion> invitaciones);

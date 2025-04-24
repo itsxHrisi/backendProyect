@@ -35,16 +35,22 @@ public class InvitacionController {
     public ResponseEntity<List<Invitacion>> getByGrupo(@PathVariable Long grupoId) {
         return ResponseEntity.ok(invitacionService.getInvitacionesPorGrupo(grupoId));
     }
-
     @PutMapping("/{id}/estado")
     public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
         try {
             Invitacion.EstadoInvitacion estado = Invitacion.EstadoInvitacion.valueOf(nuevoEstado.toUpperCase());
             return invitacionService.actualizarEstado(id, estado)
-                    .map(ResponseEntity::ok)
+                    .map(invitacion -> {
+                        if (estado == Invitacion.EstadoInvitacion.ACEPTADA) {
+                            return ResponseEntity.ok("La petición ha sido aceptada");
+                        } else {
+                            return ResponseEntity.ok(invitacion);
+                        }
+                    })
                     .orElse(ResponseEntity.notFound().build());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Estado inválido: debe ser PENDIENTE, ACEPTADA o RECHAZADA");
         }
     }
+    
 }
