@@ -12,7 +12,7 @@ import proyect.proyectefinal.service.MensajeService;
 
 @Service
 public class MensajeServiceImpl implements MensajeService {
-     @Autowired
+    @Autowired
     private MensajeRepository mensajeRepository;
 
     public List<Mensaje> findAll() {

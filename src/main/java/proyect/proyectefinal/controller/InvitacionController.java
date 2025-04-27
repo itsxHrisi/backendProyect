@@ -1,8 +1,11 @@
 package proyect.proyectefinal.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import proyect.proyectefinal.model.db.Invitacion;
 import proyect.proyectefinal.model.db.UsuarioDb;
@@ -35,7 +38,7 @@ public class InvitacionController {
     public ResponseEntity<List<Invitacion>> getByGrupo(@PathVariable Long grupoId) {
         return ResponseEntity.ok(invitacionService.getInvitacionesPorGrupo(grupoId));
     }
-    @PutMapping("/{id}/estado")
+    @PutMapping("/{id}/estado") 
     public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
         try {
             Invitacion.EstadoInvitacion estado = Invitacion.EstadoInvitacion.valueOf(nuevoEstado.toUpperCase());
@@ -53,4 +56,12 @@ public class InvitacionController {
         }
     }
     
+    @GetMapping("/usuario")
+public ResponseEntity<List<Invitacion>> getInvitacionesDelUsuarioAutenticado() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String nickname = auth.getName();
+    return ResponseEntity.ok(invitacionService.getInvitacionesPorNickname(nickname));
+}
+
+
 }

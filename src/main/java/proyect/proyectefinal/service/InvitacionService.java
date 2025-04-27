@@ -12,7 +12,8 @@ import java.util.Optional;
 
 @Service
 public interface InvitacionService {  
-    public Invitacion crearInvitacion(InvitacionRequest invitacion);
+    public String crearInvitacion(InvitacionRequest invitacion);
     public List<Invitacion> getInvitacionesPorGrupo(Long grupoId);
     public Optional<Invitacion> actualizarEstado(Long id, Invitacion.EstadoInvitacion estado);
+    public List<Invitacion> getInvitacionesPorNickname(String nickname);
 }

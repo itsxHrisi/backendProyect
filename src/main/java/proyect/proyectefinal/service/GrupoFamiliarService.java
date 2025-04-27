@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface GrupoFamiliarService {
     public List<GrupoFamiliar> findAll();
     public Optional<GrupoFamiliar> findById(Long id);
-
+    public String asignarRol(String nicknameDestino, String rolStr);
     public GrupoFamiliar save(GrupoFamiliar grupo);
     public void deleteById(Long id);
 }

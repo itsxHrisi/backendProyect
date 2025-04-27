@@ -13,4 +13,6 @@ import proyect.proyectefinal.model.enums.RolNombre;
 
 public interface RolRepository extends JpaRepository<RolDb, Integer>{
     Optional<RolDb> findByNombre(RolNombre rolNombre);
+    Optional<RolDb> findByNombre(String nombre);
+
 }

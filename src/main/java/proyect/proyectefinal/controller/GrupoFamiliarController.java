@@ -134,4 +134,12 @@ public ResponseEntity<?> createGrupoFamiliar(@RequestBody GrupoFamiliar grupoFam
             return ResponseEntity.status(404).body("Grupo familiar no encontrado");
         }
     }
+    @PutMapping("/asignar-rol")
+    public ResponseEntity<String> asignarRol(@RequestParam String nicknameDestino, @RequestParam String rol) {
+        try {
+            return ResponseEntity.ok(grupoFamiliarService.asignarRol(nicknameDestino, rol));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
 }

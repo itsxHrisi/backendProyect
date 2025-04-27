@@ -3,6 +3,7 @@ package proyect.proyectefinal.srv.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import proyect.proyectefinal.model.db.Gasto;
@@ -12,11 +13,8 @@ import proyect.proyectefinal.service.GastoService;
 
 @Service
 public class GastoServiceImpl implements GastoService {
-    private final GastoRepository gastoRepository;
-
-        public GastoServiceImpl(GastoRepository gastoRepository) {
-        this.gastoRepository = gastoRepository;
-    }
+    @Autowired
+    private GastoRepository gastoRepository;
 
     public Gasto crearGasto(Gasto gasto) {
         return gastoRepository.save(gasto);
