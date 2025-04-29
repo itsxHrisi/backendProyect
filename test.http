@@ -30,7 +30,7 @@ Content-Type: application/json
     "password": "Hrisi231104!"
 }
 ###
-## login ok PERMISOS ROLE_ADMIN
+## login ok PERMISOS ROLE_USER
 POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
 
@@ -83,7 +83,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzN
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0MzQ5OTIsImV4cCI6MTc0NTQ3MDk5Mn0.MKo6v0splTgQYCamTdKMlpp8G8nzb7GUeAkDlZXsHVU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU5NTE3NTUsImV4cCI6MTc0NTk4Nzc1NX0.AqTiKGgM5OqYspCEohoOOJmkqb8M8hk_PSOw2F2W4-k
 
 {
   "nombre": "Familia Trayanov"
@@ -151,7 +151,7 @@ Authorization: Bearer {{TOKEN}}
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU3Nzg2NDQsImV4cCI6MTc0NTgxNDY0NH0.MNieRfjhrcQ8lY_MlpLfDyQrr2_wc1v_WbWxwC-Yg9k
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU5NTE3NTUsImV4cCI6MTc0NTk4Nzc1NX0.AqTiKGgM5OqYspCEohoOOJmkqb8M8hk_PSOw2F2W4-k
 
 {
   "nickname": "sofia2",
@@ -165,14 +165,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0M
 
 ###
 ### Marcar invitación con ID 5 como aceptada
-PUT http://localhost:8091/api/invitaciones/15/estado?nuevoEstado=ACEPTADA HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU3Nzg5MjUsImV4cCI6MTc0NTgxNDkyNX0.WTAyKpfebYJ4dk2ZZw2_ADlMhZYkhdTJRAg0LFJLqe4
+PUT http://localhost:8091/api/invitaciones/3/estado?nuevoEstado=ACEPTADA HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NTM4NDQsImV4cCI6MTc0NTk4OTg0NH0.X_1RrolfqQI-IGrZ0VbiIPvZh_siCR4RtJPsVYXhZgg
 
 ###
 ### Obtener todas las invitaciones dirigidas al usuario autenticado
 
-GET http://localhost:8091/api/invitaciones/sofia2 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU3Nzg2NDQsImV4cCI6MTc0NTgxNDY0NH0.MNieRfjhrcQ8lY_MlpLfDyQrr2_wc1v_WbWxwC-Yg9k
+GET http://localhost:8091/api/invitaciones/usuario HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NTE4OTUsImV4cCI6MTc0NTk4Nzg5NX0.w0qqvfChYLeCoT-pqvhfEe-MZOh8GBfAS01nNZgSGUA
 
 
 ###
@@ -180,3 +180,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU3N
 PUT http://localhost:8091/api/invitaciones/asignar-rol?nicknameDestino=sofia2&rol=padre HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0Mzg1ODAsImV4cCI6MTc0NTQ3NDU4MH0.RKGTRyu1PMudULyTh0hPA4RaxeqfWuoABXhuPgi5fQ8
 
+###
+### ARechazar una invitacion
+PUT http://localhost:8091/api/invitaciones/1/estado?nuevoEstado=RECHAZADA HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NTE4OTUsImV4cCI6MTc0NTk4Nzg5NX0.w0qqvfChYLeCoT-pqvhfEe-MZOh8GBfAS01nNZgSGUA
+###
+### Abandonar el grupo familiar actual (el usuario abandona su grupo)
+DELETE http://localhost:8091/api/grupos/abandonar HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NTM4NDQsImV4cCI6MTc0NTk4OTg0NH0.X_1RrolfqQI-IGrZ0VbiIPvZh_siCR4RtJPsVYXhZgg
+
+###
+### Expulsar al usuario "sofia2" del grupo familiar con ID 1
+PUT http://localhost:8091/api/grupos/1/eliminar-usuario/sofia2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU5NTQxMTMsImV4cCI6MTc0NTk5MDExM30.P25IIYYlDHXEV1QkGWzJV5XEBy0NBZXPejXQxISQ7MA
+Content-Type: application/json

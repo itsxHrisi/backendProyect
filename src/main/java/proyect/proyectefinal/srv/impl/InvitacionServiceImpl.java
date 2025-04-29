@@ -88,34 +88,37 @@ public class InvitacionServiceImpl implements InvitacionService {
     @Override
     @Transactional
     public Optional<Invitacion> actualizarEstado(Long id, Invitacion.EstadoInvitacion nuevoEstado) {
-        Optional<Invitacion> optionalInvitacion = invitacionRepository.findById(id);
+        Optional<Invitacion> invitacionOpt = invitacionRepository.findById(id);
     
-        if (optionalInvitacion.isPresent()) {
-            Invitacion invitacion = optionalInvitacion.get();
+        if (invitacionOpt.isPresent()) {
+            Invitacion invitacion = invitacionOpt.get();
             invitacion.setEstado(nuevoEstado);
+            invitacionRepository.save(invitacion);
     
+            // Si se ha aceptado, asignar grupo al usuario
             if (nuevoEstado == Invitacion.EstadoInvitacion.ACEPTADA) {
-                // 1. Buscar el usuario que aceptó la invitación
-                Optional<UsuarioDb> optionalUsuario = usuarioRepository.findByNickname(invitacion.getNicknameDestino());
+                UsuarioDb usuarioDestino = usuarioRepository.findByNickname(invitacion.getNicknameDestino())
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + invitacion.getNicknameDestino()));
     
-                if (optionalUsuario.isPresent()) {
-                    UsuarioDb usuario = optionalUsuario.get();
-                    // 2. Asignarle el grupo familiar
-                    usuario.setGrupoFamiliar(invitacion.getGrupo());
+                usuarioDestino.setGrupoFamiliar(invitacion.getGrupo());
+                usuarioRepository.save(usuarioDestino);
     
-                    // 3. Guardar el usuario
-                    usuarioRepository.save(usuario);
-                } else {
-                    throw new RuntimeException("No se encontró el usuario destino para la invitación");
-                }
+                // Eliminar la invitación
+                invitacionRepository.delete(invitacion);
             }
     
-            // Guardar los cambios en la invitación también
-            invitacionRepository.save(invitacion);
+            // Si se ha rechazado, también eliminar la invitación
+            if (nuevoEstado == Invitacion.EstadoInvitacion.RECHAZADA) {
+                invitacionRepository.delete(invitacion);
+            }
+    
+            return Optional.of(invitacion);
         }
     
-        return optionalInvitacion;
+        return Optional.empty();
     }
+    
+    
     
     public List<Invitacion> getInvitacionesPorNickname(String nickname) {
         return invitacionRepository.findByNicknameDestino(nickname);
