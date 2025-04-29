@@ -6,7 +6,7 @@ Content-Type: application/json
 {
     "nickname": "hrisi2",
     "nombre": "hristsiyan\nTrayanov",
-    "email": "hristsiyantg@gmail.com",
+    "email": "hristiyantg2@gmail.com",
     "password": "Hrisi231104!"
 }
 ###
@@ -194,3 +194,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5N
 PUT http://localhost:8091/api/grupos/1/eliminar-usuario/sofia2 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU5NTQxMTMsImV4cCI6MTc0NTk5MDExM30.P25IIYYlDHXEV1QkGWzJV5XEBy0NBZXPejXQxISQ7MA
 Content-Type: application/json
+###
+### Actualizar mis propios datos (nickname viejo en la URL)
+PUT http://localhost:8091/api/usuarios/sofia3/actualizar HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTMiLCJpYXQiOjE3NDU5NjM3NTEsImV4cCI6MTc0NTk5OTc1MX0.pA4E4yBLN8eXfICucvDzCXoHMNmlMx5aqzy9b5pKJLE
+
+{
+  "nombre": "Sofia Georgi",
+  "nickname": "sofia3",
+  "email": "nuevo@email.com",
+  "password": "NuevaPa",
+  "password2": "NuevaPa"
+}
+###
+### Obtener perfil del usuario autenticado
+GET http://localhost:8091/api/usuarios/perfil HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NjAwNjIsImV4cCI6MTc0NTk5NjA2Mn0.oDJI4G-b5yaz8dskACQoPzePJQhlgHe21M7kgy1GVuI

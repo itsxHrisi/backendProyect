@@ -32,6 +32,7 @@ import proyect.proyectefinal.security.service.RolService;
 import proyect.proyectefinal.security.service.UsuarioService;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -56,10 +57,16 @@ public class AuthController {
 
     @PostMapping("/nuevo")
 public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult) {
-    if (bindingResult.hasErrors())
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MensajeText("Datos incorrectos o email inválido"));
+    if (bindingResult.hasErrors()) {
+        List<String> errores = bindingResult.getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .toList();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errores);
+    }
+
     if (usuarioService.existsByNickname(nuevoUsuario.getNickname()))
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MensajeText("El nickname del usuario ya existe"));
+
     if (usuarioService.existsByEmail(nuevoUsuario.getEmail()))
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MensajeText("El email del usuario ya existe"));
 

@@ -1,5 +1,4 @@
 package proyect.proyectefinal.model.dto;
-
 import lombok.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,24 +8,19 @@ import jakarta.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UsuarioEdit {
+public class UsuarioEditConPassword {
 
-    @NotBlank(message = "El nombre no puede estar vacío")
     private String nombre;
-
-    @NotBlank(message = "El nickname no puede estar vacío")
     private String nickname;
 
-    @Email(message = "El formato del email no es válido")
+    @Email(message = "Formato de email inválido")
     @NotBlank(message = "El email no puede estar vacío")
     private String email;
 
     @Pattern(
         regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$",
-        message = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número"
-    )
-    @NotBlank(message = "La contraseña no puede estar vacía")
+        message = "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número")
     private String password;
+
+    private String password2;
 }
-
-
