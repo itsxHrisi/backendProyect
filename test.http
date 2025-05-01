@@ -15,6 +15,17 @@ POST http://localhost:8091/auth/nuevo HTTP/1.1
 Content-Type: application/json
 
 {
+    "nickname": "hrisi3",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristiyantg@gmail.com",
+    "password": "Hrisi231104!"
+}
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
     "nickname": "sofia2",
     "nombre": "sofia\nTrayanova",
     "email": "sofiatg@gmail.com",
@@ -83,10 +94,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzN
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU5NTE3NTUsImV4cCI6MTc0NTk4Nzc1NX0.AqTiKGgM5OqYspCEohoOOJmkqb8M8hk_PSOw2F2W4-k
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTMiLCJpYXQiOjE3NDYxMDI5MzYsImV4cCI6MTc0NjEzODkzNn0.Th5Qz5I0fi5tVmm0L_49_Sg52lo8eTou6PUrd4n4IqU
 
 {
-  "nombre": "Familia Trayanov"
+  "nombre": "Familia Trayanov2"
 }
 ###
 ## Obtener grupo por ID
@@ -151,11 +162,11 @@ Authorization: Bearer {{TOKEN}}
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU5NTE3NTUsImV4cCI6MTc0NTk4Nzc1NX0.AqTiKGgM5OqYspCEohoOOJmkqb8M8hk_PSOw2F2W4-k
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTMiLCJpYXQiOjE3NDYxMDI5MzYsImV4cCI6MTc0NjEzODkzNn0.Th5Qz5I0fi5tVmm0L_49_Sg52lo8eTou6PUrd4n4IqU
 
 {
   "nickname": "sofia2",
-  "grupoId": 1
+  "grupoId": 2
 }
 
 ###
@@ -165,8 +176,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0M
 
 ###
 ### Marcar invitación con ID 5 como aceptada
-PUT http://localhost:8091/api/invitaciones/3/estado?nuevoEstado=ACEPTADA HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NTM4NDQsImV4cCI6MTc0NTk4OTg0NH0.X_1RrolfqQI-IGrZ0VbiIPvZh_siCR4RtJPsVYXhZgg
+PUT http://localhost:8091/api/invitaciones/1/estado?nuevoEstado=ACEPTADA HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDYxMDI5NzMsImV4cCI6MTc0NjEzODk3M30.QgTqfoeS9bw6RsyRryYhIYaFZqVKJbGMiU0H5N_prT8
 
 ###
 ### Obtener todas las invitaciones dirigidas al usuario autenticado
@@ -211,3 +222,36 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTMiLCJpYXQiOjE3NDU5N
 ### Obtener perfil del usuario autenticado
 GET http://localhost:8091/api/usuarios/perfil HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NjAwNjIsImV4cCI6MTc0NTk5NjA2Mn0.oDJI4G-b5yaz8dskACQoPzePJQhlgHe21M7kgy1GVuI
+
+
+
+### Obtener todos los usuarios (paginados básicos)
+###
+GET http://localhost:8091/api/usuarios/usuarios?page=0&size=3&sort=id,asc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYxMjQ5OTMsImV4cCI6MTc0NjE2MDk5M30.6JqKWD5LquMIeMMdam8pjQWenY-3jAKC2BolL6-A0N0
+
+###Obtener todos los usuarios paginados
+###
+GET http://localhost:8091/api/usuarios/v1/usuarios?page=0&size=3&sortField=id&sortDirection=asc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYxMjgwMTksImV4cCI6MTc0NjE2NDAxOX0.017jiTjMFxOA2sH3dSriUBpS_ZbmBI2ISzJrAxfQB3I
+
+###Obtener los usuarios mediante busqueda
+###
+POST http://localhost:8091/api/usuarios/v1/usuarios/x HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYxMjc0ODEsImV4cCI6MTc0NjE2MzQ4MX0.0IuMAOw6sVz7edeMYXlXv3bnJUrEMEJivQy8w0rI81I
+
+{
+  "pagina": 0,
+  "size": 3,
+  "sort": ["id,asc"],
+  "listaFiltros": [
+    {
+      "campo": "nombre",
+      "operador": "contiene",
+      "valor": "hris"
+    }
+  ]
+}
+
+

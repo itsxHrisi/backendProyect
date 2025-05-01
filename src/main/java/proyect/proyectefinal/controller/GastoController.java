@@ -50,7 +50,8 @@ public class GastoController {
         Gasto saved = gastoRepository.save(gasto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
- @GetMapping
+
+    @GetMapping
     public List<GastoInfo> getAllGastos() {
         return gastoRepository.findAll().stream()
                 .map(GastoMapper.INSTANCE::gastoToGastoInfo)
@@ -58,16 +59,15 @@ public class GastoController {
     }
 
     @GetMapping("/{id}")
-public ResponseEntity<?> getGasto(@PathVariable Long id) {
-    Optional<Gasto> gastoOptional = gastoRepository.findById(id);
-    if (gastoOptional.isPresent()) {
-        GastoInfo dto = GastoMapper.INSTANCE.gastoToGastoInfo(gastoOptional.get());
-        return ResponseEntity.ok(dto);
-    } else {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El gasto no existe");
+    public ResponseEntity<?> getGasto(@PathVariable Long id) {
+        Optional<Gasto> gastoOptional = gastoRepository.findById(id);
+        if (gastoOptional.isPresent()) {
+            GastoInfo dto = GastoMapper.INSTANCE.gastoToGastoInfo(gastoOptional.get());
+            return ResponseEntity.ok(dto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El gasto no existe");
+        }
     }
-}
-
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateGasto(@PathVariable Long id, @RequestBody GastoEdit gastoEdit) {
@@ -105,27 +105,29 @@ public ResponseEntity<?> getGasto(@PathVariable Long id) {
         return switch (tipo) {
             case SUPERVIVENCIA -> Set.of(
                     SubtipoGasto.AGUA, SubtipoGasto.BASURAS, SubtipoGasto.COMIDA, SubtipoGasto.COMUNIDAD,
-                    SubtipoGasto.FARMACIA, SubtipoGasto.GAS, SubtipoGasto.GASOIL, SubtipoGasto.GIMNASIO, SubtipoGasto.HIJOS,
-                    SubtipoGasto.HIPOTECA, SubtipoGasto.IBI, SubtipoGasto.LUZ, SubtipoGasto.MANT_COCHE, SubtipoGasto.MUTUA,
-                    SubtipoGasto.ROPA_IMPRESCINDIBLE, SubtipoGasto.SALUD, SubtipoGasto.SEGURO_HOGAR, SubtipoGasto.SEGURO_VIDA,
-                    SubtipoGasto.COCHERA, SubtipoGasto.CASA_APARATOS, SubtipoGasto.DOCUMENTOS
-            ).contains(subtipo);
+                    SubtipoGasto.FARMACIA, SubtipoGasto.GAS, SubtipoGasto.GASOIL, SubtipoGasto.GIMNASIO,
+                    SubtipoGasto.HIJOS,
+                    SubtipoGasto.HIPOTECA, SubtipoGasto.IBI, SubtipoGasto.LUZ, SubtipoGasto.MANT_COCHE,
+                    SubtipoGasto.MUTUA,
+                    SubtipoGasto.ROPA_IMPRESCINDIBLE, SubtipoGasto.SALUD, SubtipoGasto.SEGURO_HOGAR,
+                    SubtipoGasto.SEGURO_VIDA,
+                    SubtipoGasto.COCHERA, SubtipoGasto.CASA_APARATOS, SubtipoGasto.DOCUMENTOS).contains(subtipo);
             case LUJO -> Set.of(
                     SubtipoGasto.ESPECTACULOS, SubtipoGasto.ESTETICA, SubtipoGasto.MAQUILLAJE, SubtipoGasto.PARKING,
-                    SubtipoGasto.REGALOS, SubtipoGasto.RESTAURANTES, SubtipoGasto.ROPA_COMPLEMENTOS, SubtipoGasto.SUBS_OCIO,
-                    SubtipoGasto.VIAJES, SubtipoGasto.SALIDAS_OCIO, SubtipoGasto.TELEFONO_INTERNET, SubtipoGasto.LOTERIA,
-                    SubtipoGasto.FALLA, SubtipoGasto.LUJO_NIÑOS
-            ).contains(subtipo);
+                    SubtipoGasto.REGALOS, SubtipoGasto.RESTAURANTES, SubtipoGasto.ROPA_COMPLEMENTOS,
+                    SubtipoGasto.SUBS_OCIO,
+                    SubtipoGasto.VIAJES, SubtipoGasto.SALIDAS_OCIO, SubtipoGasto.TELEFONO_INTERNET,
+                    SubtipoGasto.LOTERIA,
+                    SubtipoGasto.FALLA, SubtipoGasto.LUJO_NIÑOS).contains(subtipo);
             case EDUCACION -> Set.of(
                     SubtipoGasto.CURSOS, SubtipoGasto.LIBROS, SubtipoGasto.MASTERS, SubtipoGasto.SUBSCRIPCIONES_EDU,
-                    SubtipoGasto.PROGRAMAS
-            ).contains(subtipo);
+                    SubtipoGasto.PROGRAMAS).contains(subtipo);
             case AHORRO -> Set.of(
-                    SubtipoGasto.BANKINTER, SubtipoGasto.TRADE_REPUBLIC, SubtipoGasto.CAIXABANK, SubtipoGasto.SABADELL
-            ).contains(subtipo);
+                    SubtipoGasto.BANKINTER, SubtipoGasto.TRADE_REPUBLIC, SubtipoGasto.CAIXABANK, SubtipoGasto.SABADELL)
+                    .contains(subtipo);
             case INVERSION -> Set.of(
-                    SubtipoGasto.HAUSERA, SubtipoGasto.IB, SubtipoGasto.MYINVESTOR, SubtipoGasto.BINANCE
-            ).contains(subtipo);
+                    SubtipoGasto.HAUSERA, SubtipoGasto.IB, SubtipoGasto.MYINVESTOR, SubtipoGasto.BINANCE)
+                    .contains(subtipo);
         };
     }
 }

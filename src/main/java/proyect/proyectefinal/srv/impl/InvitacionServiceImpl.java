@@ -86,38 +86,40 @@ public class InvitacionServiceImpl implements InvitacionService {
     }
 
     @Override
-    @Transactional
-    public Optional<Invitacion> actualizarEstado(Long id, Invitacion.EstadoInvitacion nuevoEstado) {
-        Optional<Invitacion> invitacionOpt = invitacionRepository.findById(id);
-    
-        if (invitacionOpt.isPresent()) {
-            Invitacion invitacion = invitacionOpt.get();
-            invitacion.setEstado(nuevoEstado);
-            invitacionRepository.save(invitacion);
-    
-            // Si se ha aceptado, asignar grupo al usuario
-            if (nuevoEstado == Invitacion.EstadoInvitacion.ACEPTADA) {
-                UsuarioDb usuarioDestino = usuarioRepository.findByNickname(invitacion.getNicknameDestino())
-                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + invitacion.getNicknameDestino()));
-    
-                usuarioDestino.setGrupoFamiliar(invitacion.getGrupo());
-                usuarioRepository.save(usuarioDestino);
-    
-                // Eliminar la invitación
-                invitacionRepository.delete(invitacion);
-            }
-    
-            // Si se ha rechazado, también eliminar la invitación
-            if (nuevoEstado == Invitacion.EstadoInvitacion.RECHAZADA) {
-                invitacionRepository.delete(invitacion);
-            }
-    
-            return Optional.of(invitacion);
+@Transactional
+public Optional<Invitacion> actualizarEstado(Long id, Invitacion.EstadoInvitacion nuevoEstado) {
+    Optional<Invitacion> invitacionOpt = invitacionRepository.findById(id);
+
+    if (invitacionOpt.isPresent()) {
+        Invitacion invitacion = invitacionOpt.get();
+        invitacion.setEstado(nuevoEstado);
+        invitacionRepository.save(invitacion);
+
+        if (nuevoEstado == Invitacion.EstadoInvitacion.ACEPTADA) {
+            // Obtener el usuario destino
+            UsuarioDb usuarioDestino = usuarioRepository.findByNickname(invitacion.getNicknameDestino())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + invitacion.getNicknameDestino()));
+
+            // Asignar el grupo familiar
+            usuarioDestino.setGrupoFamiliar(invitacion.getGrupo());
+            usuarioRepository.save(usuarioDestino);
+
+            // Eliminar todas las invitaciones que tenga el usuario
+            List<Invitacion> invitacionesUsuario = invitacionRepository.findByNicknameDestino(usuarioDestino.getNickname());
+            invitacionRepository.deleteAll(invitacionesUsuario);
         }
-    
-        return Optional.empty();
+
+        if (nuevoEstado == Invitacion.EstadoInvitacion.RECHAZADA) {
+            // Si es rechazada, solo eliminar esa invitación
+            invitacionRepository.delete(invitacion);
+        }
+
+        return Optional.of(invitacion);
     }
-    
+
+    return Optional.empty();
+}
+
     
     
     public List<Invitacion> getInvitacionesPorNickname(String nickname) {
