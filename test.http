@@ -50,17 +50,26 @@ Content-Type: application/json
     "password": "Sofia230512!"
 }
 ###
+## login ok PERMISOS ROLE_USER
+POST http://localhost:8091/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "hrisi3",
+    "password": "Hrisi231104!"
+}
+###
 ## Crear gasto (asegúrate de usar enums válidos en tipoGasto y subtipo)
 POST http://localhost:8091/api/gastos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyNTc1MTgsImV4cCI6MTc0NTI5MzUxOH0.68KBlr8CwrklAz-6ftojIvWWYMYrv5BSYQj53XZ216A
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyODU3ODYsImV4cCI6MTc0NjMyMTc4Nn0.ibShRouPt8h4aki0SrOGXwGgVzgkhhBj2Sddf5dLrng
 
 {
   "usuario": { "id": 1 },
   "grupo": { "id": 1 },
   "tipoGasto": "LUJO",
-  "subtipo": "ESPECTACULOS",
-  "cantidad": 100.50,
+  "subtipo": "ESTETICA",
+  "cantidad": "42,50",
   "fecha": "2025-04-06"
 }
 ###
@@ -70,9 +79,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyN
 
 ###
 ## Actualizar gasto
-PUT http://localhost:8091/api/gastos/2 HTTP/1.1
+PUT http://localhost:8091/api/gastos/1 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyNTc1MTgsImV4cCI6MTc0NTI5MzUxOH0.68KBlr8CwrklAz-6ftojIvWWYMYrv5BSYQj53XZ216A
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyNzUzNTAsImV4cCI6MTc0NjMxMTM1MH0.qm4iOC3oo0SGPVG9ZFa2frhPkDubhWyHo0TvG7aOmqM
 
 {
   "usuario": { "id": 1 },
@@ -87,14 +96,25 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyN
 DELETE http://localhost:8091/api/gastos/2 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzNDI2NTcsImV4cCI6MTc0NTM3ODY1N30.rVvwNwyObe9AjRAtI0XQbxgcGdvigEZalVD4TdDmw4g
 
+###
+## Actualizar gasto con id 3
+PUT http://localhost:8091/api/gastos/3 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyODY5MTAsImV4cCI6MTc0NjMyMjkxMH0.wd-Ah-9kkgvFEpDsibVIcpAX8Ef5tCqm_FWE0kT4cnI
 
+{
+  "tipoGasto": "LUJO",
+  "subtipo": "VIAJES",
+  "cantidad": "123,45",
+  "fecha": "2025-05-02"
+}
 
 
 ###
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTMiLCJpYXQiOjE3NDYxMDI5MzYsImV4cCI6MTc0NjEzODkzNn0.Th5Qz5I0fi5tVmm0L_49_Sg52lo8eTou6PUrd4n4IqU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyMjA5MDYsImV4cCI6MTc0NjI1NjkwNn0.1iqXFNV6r6LuBMNbNGS58rSALoqLhRDATAxH5N0LRCo
 
 {
   "nombre": "Familia Trayanov2"
@@ -154,6 +174,18 @@ Authorization: Bearer {{TOKEN}}
   "tipo": "PRIVADO"
 }
 ###
+## Sumar gastos de luju espectaculos
+GET http://localhost:8091/api/gastos/suma-gastos?tipoGasto=LUJO&subtipo=ESPECTACULOS
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyODQyMjIsImV4cCI6MTc0NjMyMDIyMn0.cBdXM4tbrULQlOZSoyiF9-OqvL0vJmbGV3hiTP_JM5E
+
+###
+## sumar gastos de tipo lujo
+GET http://localhost:8091/api/gastos/suma-gastos?tipoGasto=LUJO
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyODQyMjIsImV4cCI6MTc0NjMyMDIyMn0.cBdXM4tbrULQlOZSoyiF9-OqvL0vJmbGV3hiTP_JM5E
+
+###
 ## Eliminar mensaje
 DELETE http://localhost:8091/api/mensajes/1 HTTP/1.1
 Authorization: Bearer {{TOKEN}}
@@ -162,11 +194,11 @@ Authorization: Bearer {{TOKEN}}
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTMiLCJpYXQiOjE3NDYxMDI5MzYsImV4cCI6MTc0NjEzODkzNn0.Th5Qz5I0fi5tVmm0L_49_Sg52lo8eTou6PUrd4n4IqU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyNzUyMjcsImV4cCI6MTc0NjMxMTIyN30.WK4SOACXZgqLAt-nA4G0W2nfTxJ3H4SivtjYkYH2sfo
 
 {
-  "nickname": "sofia2",
-  "grupoId": 2
+  "nickname": "hrisi3",
+  "grupoId": 1
 }
 
 ###
@@ -177,7 +209,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0M
 ###
 ### Marcar invitación con ID 5 como aceptada
 PUT http://localhost:8091/api/invitaciones/1/estado?nuevoEstado=ACEPTADA HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDYxMDI5NzMsImV4cCI6MTc0NjEzODk3M30.QgTqfoeS9bw6RsyRryYhIYaFZqVKJbGMiU0H5N_prT8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTMiLCJpYXQiOjE3NDYyNzUyNDYsImV4cCI6MTc0NjMxMTI0Nn0.6q8ru_VTh_d82IZeOIMVbvxu2N-dhyLWH7dhQHNaHJQ
 
 ###
 ### Obtener todas las invitaciones dirigidas al usuario autenticado

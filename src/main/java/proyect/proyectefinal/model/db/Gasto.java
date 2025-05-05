@@ -33,7 +33,9 @@ public class Gasto {
     @Column(name = "subtipo", nullable = false)
     private String subtipo;
 
-    private Long cantidad;
+    @Column(nullable = false)
+    private BigDecimal cantidad;
+
 
     private LocalDate fecha;
 }

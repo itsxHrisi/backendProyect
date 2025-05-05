@@ -72,7 +72,7 @@ CREATE TABLE Gasto (
     usuario_id BIGINT NOT NULL,
     grupo_id BIGINT NOT NULL,
     tipo_gasto VARCHAR(50) NOT NULL,
-    subtipo_id VARCHAR(50) NOT NULL,
+    subtipo VARCHAR(50) NOT NULL,  -- 👈 Aquí subtipo (sin _id)
     cantidad DECIMAL(10,2) NOT NULL,
     fecha DATE NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id),

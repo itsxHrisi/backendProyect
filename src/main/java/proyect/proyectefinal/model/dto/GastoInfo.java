@@ -1,5 +1,6 @@
 package proyect.proyectefinal.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import lombok.*;
@@ -13,7 +14,7 @@ public class GastoInfo {
     private Long id;
     private String tipoGasto;
     private String subtipo;
-    private Long cantidad;
+    private BigDecimal  cantidad;
     private LocalDate fecha;
     private String usuarioNickname;
 }
