@@ -95,7 +95,6 @@ CREATE TABLE Mensaje (
     grupo_id BIGINT,
     contenido TEXT NOT NULL,
     fecha TIMESTAMP NOT NULL,
-    tipo VARCHAR(50) NOT NULL,
     FOREIGN KEY (emisor_id) REFERENCES usuarios(id),
     FOREIGN KEY (receptor_id) REFERENCES usuarios(id),
     FOREIGN KEY (grupo_id) REFERENCES GrupoFamiliar(id)

@@ -8,5 +8,4 @@ import lombok.*;
 @Builder
 public class MensajeEdit {
     private String contenido;
-    private String tipo;
 }

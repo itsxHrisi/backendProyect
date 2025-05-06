@@ -20,18 +20,18 @@ public class Mensaje {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private UsuarioDb emisor;
+    @Column(name = "emisor_id", nullable = false)
+    private Long emisorId;
 
-    @ManyToOne
-    private UsuarioDb receptor;
+    @Column(name = "receptor_id", nullable = false)
+    private Long receptorId;
 
-    @ManyToOne
-    private GrupoFamiliar grupo;
+    @Column(name = "grupo_id")
+    private Long grupoId;
 
+    @Column(name = "contenido", nullable = false, columnDefinition = "TEXT")
     private String contenido;
 
+    @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
-
-    private String tipo;
 }
