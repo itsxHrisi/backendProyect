@@ -3,6 +3,7 @@ package proyect.proyectefinal.helper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +45,31 @@ public class PaginationHelper {
     }
 
     */
+   // Nuevo método que acepta List<String>
+    public static Pageable createPageable(int page, int size, List<String> sortList) {
+        if (sortList == null || sortList.isEmpty()) {
+            return PageRequest.of(page, size);
+        }
+        List<Sort.Order> orders = sortList.stream()
+            .map(PaginationHelper::toOrder)
+            .collect(Collectors.toList());
+        return PageRequest.of(page, size, Sort.by(orders));
+    }
 
+    private static Sort.Order toOrder(String sortParam) {
+        String[] parts = sortParam.split(",");
+        String property = parts[0].trim();
+        Sort.Direction direction = Sort.Direction.ASC;
+        if (parts.length > 1) {
+            try {
+                direction = Sort.Direction.fromString(parts[1].trim());
+            } catch (IllegalArgumentException e) {
+                // si viene algo raro, por defecto ASC
+                direction = Sort.Direction.ASC;
+            }
+        }
+        return new Sort.Order(direction, property);
+    }
 
     public static Pageable createPageable(int page, int size, String[] sort) {
         List<Order> cristeriosOrdenacion = new ArrayList<Order>();

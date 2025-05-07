@@ -3,8 +3,9 @@ package proyect.proyectefinal.service;
 import org.springframework.stereotype.Service;
 import proyect.proyectefinal.model.db.Gasto;
 import proyect.proyectefinal.model.dto.GastoEdit;
+import proyect.proyectefinal.model.dto.GastoInfo;
 import proyect.proyectefinal.repository.GastoRepository;
-
+import org.springframework.data.domain.Page;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,18 @@ public interface GastoService {
     public List<GastoEdit> obtenerPorUsuarioId(Long usuarioId);
     public List<GastoEdit> obtenerPorGrupoId(Long grupoId);
 
+   
+    
+        Page<GastoInfo> findGastosByUser(
+          String nickname,
+          String tipoGasto,
+          String subtipo,
+          int page,
+          int size,
+          List<String> sort
+        );
+    
+    
 } 
 
 

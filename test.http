@@ -66,14 +66,14 @@ Content-Type: application/json
 ## Crear gasto (asegúrate de usar enums válidos en tipoGasto y subtipo)
 POST http://localhost:8091/api/gastos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyODU3ODYsImV4cCI6MTc0NjMyMTc4Nn0.ibShRouPt8h4aki0SrOGXwGgVzgkhhBj2Sddf5dLrng
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDU5MjgsImV4cCI6MTc0NjY4MTkyOH0.x-tNi1ygAGlaNKONLw1PUbjdxPna7Rn8KFDyNRunV_c
 
 {
   "usuario": { "id": 1 },
   "grupo": { "id": 1 },
   "tipoGasto": "LUJO",
-  "subtipo": "ESTETICA",
-  "cantidad": "42,50",
+  "subtipo": "ESPECTACULOS",
+  "cantidad": "43,50",
   "fecha": "2025-04-06"
 }
 ###
@@ -118,7 +118,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY0Nzc3NTksImV4cCI6MTc0NjUxMzc1OX0.EwferH7ziCvihkrrX-8O5p_VBF_PAS6JVDwYkMEpix0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDU5MjgsImV4cCI6MTc0NjY4MTkyOH0.x-tNi1ygAGlaNKONLw1PUbjdxPna7Rn8KFDyNRunV_c
 
 {
   "nombre": "Familia Trayanov2"
@@ -348,3 +348,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2N
   "size": 10,
   "sort": ["id,asc"]
 }
+
+### Obtener gastos con filtros
+###
+GET http://localhost:8091/api/gastos/filter?nickname=hrisi2&filter=tipoGasto:CONTIENE:LUJO&filter=subtipo:IGUAL:ESPECTACULOS&page=0&size=10&sort=fecha,desc&sort=fecha,desc HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDgzMzgsImV4cCI6MTc0NjY4NDMzOH0.flJ_dLmBVAvvH6n2fYffeAkS6tV2dF7Nrq_eFw32jW8
+
+###
+###Obtener todos los gastos paginados
+GET http://localhost:8091/api/gastos/page?page=0&size=5&sort=fecha,desc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDgzMzgsImV4cCI6MTc0NjY4NDMzOH0.flJ_dLmBVAvvH6n2fYffeAkS6tV2dF7Nrq_eFw32jW8
+
+###
+###Obtener gastos filtrados por tipo y subtipo
+GET http://localhost:8091/api/gastos/page?page=0&size=20&sort=fecha,asc&tipoGasto=LUJO&subtipo=ESPECTACULOS HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDgzMzgsImV4cCI6MTc0NjY4NDMzOH0.flJ_dLmBVAvvH6n2fYffeAkS6tV2dF7Nrq_eFw32jW8
