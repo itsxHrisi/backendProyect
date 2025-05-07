@@ -16,5 +16,5 @@ public class UsuarioInfo {
     private String nickname;
     private String email;
     private Set<RolInfo> roles; 
-    
+    private String telefono;
 }

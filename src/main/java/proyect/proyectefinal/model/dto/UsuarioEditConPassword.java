@@ -23,4 +23,10 @@ public class UsuarioEditConPassword {
     private String password;
 
     private String password2;
+
+    @Pattern(
+        regexp = "^\\+?\\d{9,15}$",
+        message = "El teléfono debe contener sólo dígitos, opcionalmente con '+' y entre 9 y 15 caracteres"
+      )
+      private String telefono;
 }

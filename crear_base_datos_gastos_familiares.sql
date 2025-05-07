@@ -34,6 +34,7 @@ CREATE TABLE usuarios (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     grupo_familiar_id BIGINT,
+    telefono VARCHAR(20),
     FOREIGN KEY (grupo_familiar_id) REFERENCES GrupoFamiliar(id)
 );
 COMMIT;

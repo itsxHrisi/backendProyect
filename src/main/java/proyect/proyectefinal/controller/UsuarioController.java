@@ -90,7 +90,10 @@ public class UsuarioController {
             }
             usuario.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
         }
-
+        if (request.getTelefono() != null) {
+            usuario.setTelefono(request.getTelefono());
+        }
+        
         usuarioService.save(usuario);
 
         // Generar nuevo token
@@ -137,65 +140,47 @@ public class UsuarioController {
 
         return ResponseEntity.ok(usuario);
     }
+   /**
+     * 2a) GET /api/usuarios/filter
+     *     Devuelve usuarios paginados aplicando filtros por query-params:
+     *       ?filter=campo:OPERADOR:valor
+     */
+    @GetMapping("/filter")
+    public ResponseEntity<PaginaResponse<UsuarioList>> getUsuariosFiltrados(
+            @RequestParam List<String> filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") List<String> sort
+    ) throws FiltroException {
+        PaginaResponse<UsuarioList> resultado =
+            usuarioService.findAll(filter, page, size, sort);
+        return ResponseEntity.ok(resultado);
+    }
+
     /**
-         * Constructor para inyectar el servicio de Usuarios.
-         *
-         * @param usuarioService Servicio que maneja la lógica de negocio de los
-         *                       Usuarios.
-         */
-        public UsuarioController(UsuarioService usuarioService) {
-                this.usuarioService = usuarioService;
-
+     * 2b) POST /api/usuarios/filter
+     *     Devuelve usuarios paginados aplicando un objeto de filtros completo:
+     *     {
+     *       "listaFiltros": [{ "atributo":"roles", "operacion":"CONTiene", "valor":"USUARIO" }],
+     *       "page": 0,
+     *       "size": 10,
+     *       "sort": ["id,asc"]
+     *     }
+     */
+    @PostMapping("/filter")
+    public ResponseEntity<?> getUsuariosFiltradosBody(
+            @Valid @RequestBody PeticionListadoFiltrado peticion,
+            BindingResult bindingResult
+    ) throws FiltroException {
+        if (bindingResult.hasErrors()) {
+            List<String> errores = bindingResult.getFieldErrors().stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .toList();
+            return ResponseEntity.badRequest().body(errores);
         }
-
-         /**
-        * Obtiene una lista paginada de Usuarios con opción de filtrado y ordenación.
-        *
-        * @param filter Opcional. Filtros de búsqueda en formato `campo:operador:valor`
-        *               (Ej: "nombre:contiene:Messi").
-        * @param page   Número de página (por defecto 0).
-        * @param size   Cantidad de elementos por página (por defecto 3).
-        * @param sort   Ordenación en formato `campo,direccion` (Ej: "idEquipo,asc").
-        * @return Una respuesta con la lista paginada de Usuarios.
-        * @throws FiltroException Si ocurre un error en la aplicación de filtros.
-        */
-       @Operation(summary = "Obtener Usuarios paginados", description = "Retorna una lista paginada de Usuarios aplicando filtros y ordenación opcionales.")
-       @ApiResponses({
-       @ApiResponse(responseCode = "200", description = "Lista de Usuarios obtenida correctamente", content = {
-                       @Content(mediaType = "application/json", schema = @Schema(implementation = PaginaResponse.class)) }),
-       @ApiResponse(responseCode = "400", description = "Bad Request: Errores de filtrado u ordenación (errorCodes: 'BAD_OPERATOR_FILTER','BAD_ATTRIBUTE_ORDER','BAD_ATTRIBUTE_FILTER','BAD_FILTER'", content = {
-                       @Content(mediaType = "application/json", schema = @Schema(implementation = CustomErrorResponse.class)) }),
-       @ApiResponse(responseCode = "500", description = "Error interno del servidor") })
-       @GetMapping("/v1/usuarios")
-       public ResponseEntity<PaginaResponse<UsuarioList>> getAllUsuarios(
-                       @RequestParam(required = false) List<String> filter,
-                       @RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "3") int size,
-                       @RequestParam(defaultValue = "id,asc") List<String> sort) throws FiltroException {
-               return ResponseEntity.ok(usuarioService.findAll(filter, page, size, sort));
-       }
-
-       /**
-        * Obtiene una lista paginada de Usuarios mediante una solicitud POST con un
-        * objeto de filtros.
-        *
-        * @param peticionListadoFiltrado Objeto con los filtros de búsqueda y opciones
-        *                                de paginación.
-        * @return Una respuesta con la lista paginada de Usuarios.
-        * @throws FiltroException Si ocurre un error en la aplicación de filtros.
-        */
-       @Operation(summary = "Obtener Usuarios con filtros avanzados", description = "Retorna Usuarios paginados enviando los filtros en el cuerpo de la petición.")
-       @ApiResponses({
-                       @ApiResponse(responseCode = "200", description = "Lista de Usuarios obtenida correctamente", content = {
-                                       @Content(mediaType = "application/json", schema = @Schema(implementation = PaginaResponse.class)) }),
-                       @ApiResponse(responseCode = "400", description = "Bad Request: Errores de filtrado u ordenación (errorCodes: 'BAD_OPERATOR_FILTER','BAD_ATTRIBUTE_ORDER','BAD_ATTRIBUTE_FILTER','BAD_FILTER')", content = {
-                                       @Content(mediaType = "application/json", schema = @Schema(implementation = CustomErrorResponse.class)) }),
-                       @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-       })
-       @PostMapping("/v1/usuarios/x")
-       public ResponseEntity<PaginaResponse<UsuarioList>> getAllUsuariosPost(
-                       @Valid @RequestBody PeticionListadoFiltrado peticionListadoFiltrado) throws FiltroException {
-               return ResponseEntity.ok(usuarioService.findAll(
-                               peticionListadoFiltrado));
-       }
+        PaginaResponse<UsuarioList> resultado =
+            usuarioService.findAll(peticion);
+        return ResponseEntity.ok(resultado);
+    }
 }
+

@@ -74,7 +74,9 @@ public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, Bi
         nuevoUsuario.getNombre(),
         nuevoUsuario.getNickname(),
         nuevoUsuario.getEmail(),
-        passwordEncoder.encode(nuevoUsuario.getPassword())
+        passwordEncoder.encode(nuevoUsuario.getPassword()),
+        nuevoUsuario.getTelefono()
+        
     );
 
     Set<RolDb> rolesDb = new HashSet<>();

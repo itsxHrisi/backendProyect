@@ -57,11 +57,15 @@ public class UsuarioDb {
     @JoinTable(name = "usuarios_roles", joinColumns = @JoinColumn(name = "idUsuario"),
     inverseJoinColumns = @JoinColumn(name = "idRol"))
     private Set<RolDb> roles = new HashSet<>();
-    
-    public UsuarioDb(String nombre, String nickname, String email, String password) {
+
+    @Column(length = 20)
+    private String telefono;
+
+    public UsuarioDb(String nombre, String nickname, String email, String password, String telefono) {
         this.nombre = nombre;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
+        this.telefono=telefono;
     }
 }

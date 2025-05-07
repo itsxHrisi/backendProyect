@@ -28,4 +28,6 @@ public class NuevoUsuario {
     @NotBlank
     private String password;
 
+    @NotBlank(message = "El teléfono no puede estar vacío")
+    private String telefono;
 }
