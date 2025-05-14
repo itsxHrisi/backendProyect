@@ -1,16 +1,20 @@
--- 1️⃣ Eliminar claves foráneas para evitar conflictos
-ALTER TABLE IF EXISTS usuarios DROP CONSTRAINT IF EXISTS fk_usuarios_grupo_familiar;
-ALTER TABLE IF EXISTS GrupoFamiliar DROP CONSTRAINT IF EXISTS fk_grupo_admin;
-ALTER TABLE IF EXISTS Gasto DROP CONSTRAINT IF EXISTS gasto_usuario_id_fkey;
-ALTER TABLE IF EXISTS Gasto DROP CONSTRAINT IF EXISTS gasto_grupo_id_fkey;
-ALTER TABLE IF EXISTS Invitacion DROP CONSTRAINT IF EXISTS invitacion_grupo_id_fkey;
-ALTER TABLE IF EXISTS Mensaje DROP CONSTRAINT IF EXISTS mensaje_emisor_id_fkey;
-ALTER TABLE IF EXISTS Mensaje DROP CONSTRAINT IF EXISTS mensaje_receptor_id_fkey;
-ALTER TABLE IF EXISTS Mensaje DROP CONSTRAINT IF EXISTS mensaje_grupo_id_fkey;
-ALTER TABLE IF EXISTS usuarios_roles DROP CONSTRAINT IF EXISTS fk_usuarios_roles_usuarios;
-ALTER TABLE IF EXISTS usuarios_roles DROP CONSTRAINT IF EXISTS fk_usuarios_roles_roles;
+-- =============================================
+-- 1️⃣ Eliminar constraints y tablas (orden inverso)
+-- =============================================
 
--- 2️⃣ Ahora sí, eliminar las tablas en el orden adecuado
+ALTER TABLE IF EXISTS sesiones_activas         DROP CONSTRAINT IF EXISTS fk_sesiones_usuario; 
+ALTER TABLE IF EXISTS usuarios_roles           DROP CONSTRAINT IF EXISTS fk_usuarios_roles_usuarios;
+ALTER TABLE IF EXISTS usuarios_roles           DROP CONSTRAINT IF EXISTS fk_usuarios_roles_roles;
+ALTER TABLE IF EXISTS GrupoFamiliar            DROP CONSTRAINT IF EXISTS fk_grupo_admin;
+ALTER TABLE IF EXISTS Gasto                    DROP CONSTRAINT IF EXISTS gasto_usuario_id_fkey;
+ALTER TABLE IF EXISTS Gasto                    DROP CONSTRAINT IF EXISTS gasto_grupo_id_fkey;
+ALTER TABLE IF EXISTS Invitacion               DROP CONSTRAINT IF EXISTS invitacion_grupo_id_fkey;
+ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS mensaje_emisor_id_fkey;
+ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS mensaje_receptor_id_fkey;
+ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS mensaje_grupo_id_fkey;
+ALTER TABLE IF EXISTS usuarios                 DROP CONSTRAINT IF EXISTS fk_usuarios_grupo_familiar;
+
+DROP TABLE IF EXISTS sesiones_activas;
 DROP TABLE IF EXISTS usuarios_roles;
 DROP TABLE IF EXISTS Gasto;
 DROP TABLE IF EXISTS Invitacion;
@@ -20,7 +24,14 @@ DROP TABLE IF EXISTS usuarios;
 DROP TABLE IF EXISTS GrupoFamiliar;
 DROP TABLE IF EXISTS roles;
 
--- Crear tablas
+-- =============================================
+-- 2️⃣ Crear tablas base
+-- =============================================
+
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
+);
 
 CREATE TABLE GrupoFamiliar (
     id BIGSERIAL PRIMARY KEY,
@@ -35,32 +46,24 @@ CREATE TABLE usuarios (
     password VARCHAR(255) NOT NULL,
     grupo_familiar_id BIGINT,
     telefono VARCHAR(20),
-    FOREIGN KEY (grupo_familiar_id) REFERENCES GrupoFamiliar(id)
+    CONSTRAINT fk_usuarios_grupo_familiar FOREIGN KEY (grupo_familiar_id)
+        REFERENCES GrupoFamiliar(id) ON DELETE SET NULL
 );
-COMMIT;
-
-BEGIN;
-CREATE TABLE IF NOT EXISTS roles (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL
-);
-COMMIT;
-
-BEGIN;
-CREATE TABLE IF NOT EXISTS usuarios_roles (
-    idUsuario BIGINT NOT NULL,
-    idRol INTEGER NOT NULL,
-    PRIMARY KEY (idUsuario, idRol),
-    CONSTRAINT fk_usuarios_roles_usuarios FOREIGN KEY (idUsuario)
-        REFERENCES usuarios (id) ON DELETE CASCADE,
-    CONSTRAINT fk_usuarios_roles_roles FOREIGN KEY (idRol)
-        REFERENCES roles (id) ON DELETE CASCADE
-);
-COMMIT;
 
 ALTER TABLE GrupoFamiliar
-ADD COLUMN administrador_id BIGINT,
-ADD CONSTRAINT fk_grupo_admin FOREIGN KEY (administrador_id) REFERENCES usuarios(id);
+    ADD COLUMN administrador_id BIGINT,
+    ADD CONSTRAINT fk_grupo_admin FOREIGN KEY (administrador_id)
+        REFERENCES usuarios(id) ON DELETE SET NULL;
+
+CREATE TABLE usuarios_roles (
+    idUsuario BIGINT NOT NULL,
+    idRol    INTEGER NOT NULL,
+    PRIMARY KEY (idUsuario, idRol),
+    CONSTRAINT fk_usuarios_roles_usuarios FOREIGN KEY (idUsuario)
+        REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT fk_usuarios_roles_roles FOREIGN KEY (idRol)
+        REFERENCES roles(id) ON DELETE CASCADE
+);
 
 CREATE TABLE SubtipoGasto (
     id BIGSERIAL PRIMARY KEY,
@@ -71,38 +74,63 @@ CREATE TABLE SubtipoGasto (
 CREATE TABLE Gasto (
     id BIGSERIAL PRIMARY KEY,
     usuario_id BIGINT NOT NULL,
-    grupo_id BIGINT NOT NULL,
+    grupo_id   BIGINT NOT NULL,
     tipo_gasto VARCHAR(50) NOT NULL,
-    subtipo VARCHAR(50) NOT NULL,  -- 👈 Aquí subtipo (sin _id)
-    cantidad DECIMAL(10,2) NOT NULL,
-    fecha DATE NOT NULL,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-    FOREIGN KEY (grupo_id) REFERENCES GrupoFamiliar(id)
+    subtipo    VARCHAR(50) NOT NULL,
+    cantidad   DECIMAL(10,2) NOT NULL,
+    fecha      DATE NOT NULL,
+    CONSTRAINT fk_gasto_usuario FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT fk_gasto_grupo   FOREIGN KEY (grupo_id)
+        REFERENCES GrupoFamiliar(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Invitacion (
     id BIGSERIAL PRIMARY KEY,
     nickname_destino  VARCHAR(255) NOT NULL,
     grupo_id BIGINT NOT NULL,
-    estado VARCHAR(20) NOT NULL,
+    estado   VARCHAR(20)  NOT NULL,
     fecha_envio TIMESTAMP NOT NULL,
-    FOREIGN KEY (grupo_id) REFERENCES GrupoFamiliar(id)
+    CONSTRAINT fk_invitacion_grupo FOREIGN KEY (grupo_id)
+        REFERENCES GrupoFamiliar(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Mensaje (
     id BIGSERIAL PRIMARY KEY,
-    emisor_id BIGINT NOT NULL,
+    emisor_id   BIGINT NOT NULL,
     receptor_id BIGINT NOT NULL,
-    grupo_id BIGINT,
-    contenido TEXT NOT NULL,
-    fecha TIMESTAMP NOT NULL,
-    FOREIGN KEY (emisor_id) REFERENCES usuarios(id),
-    FOREIGN KEY (receptor_id) REFERENCES usuarios(id),
-    FOREIGN KEY (grupo_id) REFERENCES GrupoFamiliar(id)
+    grupo_id    BIGINT,
+    contenido   TEXT NOT NULL,
+    fecha       TIMESTAMP NOT NULL,
+    CONSTRAINT fk_mensaje_emisor    FOREIGN KEY (emisor_id)
+        REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT fk_mensaje_receptor  FOREIGN KEY (receptor_id)
+        REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT fk_mensaje_grupo     FOREIGN KEY (grupo_id)
+        REFERENCES GrupoFamiliar(id) ON DELETE CASCADE
 );
 
+-- =============================================
+-- 3️⃣ Crear tabla de sesiones activas
+-- =============================================
 
-INSERT INTO roles (nombre) VALUES 
+CREATE TABLE sesiones_activas (
+    id SERIAL PRIMARY KEY,
+    usuario_id BIGINT NOT NULL,
+    token_sesion VARCHAR(255) UNIQUE NOT NULL,
+    ip_origen VARCHAR(45),
+    dispositivo VARCHAR(255),
+    fecha_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_expiracion TIMESTAMP,
+    CONSTRAINT fk_sesiones_usuario FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- =============================================
+-- 4️⃣ Población inicial
+-- =============================================
+
+INSERT INTO roles(nombre) VALUES 
   ('ROL_USER'), 
   ('ROL_ADMIN'),
   ('ROL_PADRE'),

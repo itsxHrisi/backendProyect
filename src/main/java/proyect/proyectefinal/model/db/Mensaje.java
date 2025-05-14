@@ -34,4 +34,8 @@ public class Mensaje {
 
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;
+
+    public Mensaje(String contenido) {
+        this.contenido = contenido;
+    }
 }

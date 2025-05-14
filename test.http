@@ -11,6 +11,12 @@ Content-Type: application/json
     "telefono":"722 591 444"
 }
 ###
+###
+POST http://localhost:8091/auth/logout HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDcxNjk2NTksImV4cCI6MTc0NzIwNTY1OX0.D6halfDBcrJZujt2C4-PMnr8mUKqc3ktHVPPouJVNUg
+Content-Type: application/json
+
+###
 ## nuevo correcto
 POST http://localhost:8091/auth/nuevo HTTP/1.1
 Content-Type: application/json
