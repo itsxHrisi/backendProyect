@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,6 +35,7 @@ import proyect.proyectefinal.filters.model.PaginaResponse;
 import proyect.proyectefinal.filters.model.PeticionListadoFiltrado;
 import proyect.proyectefinal.helper.PaginationHelper;
 import proyect.proyectefinal.model.db.UsuarioDb;
+import proyect.proyectefinal.model.dto.CambioPasswordDto;
 import proyect.proyectefinal.model.dto.ListadoRespuesta;
 import proyect.proyectefinal.model.dto.PaginaDto;
 import proyect.proyectefinal.model.dto.UsuarioEdit;
@@ -48,13 +50,15 @@ import proyect.proyectefinal.security.service.UsuarioService;
 @CrossOrigin
 public class UsuarioController {
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
     @Autowired
-    JwtService jwtProvider;
+    private JwtService jwtProvider;
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
-    UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 @PutMapping("/{nickname}/actualizar")
 public ResponseEntity<?> actualizarUsuario(
         @PathVariable String nickname,
@@ -115,6 +119,25 @@ public ResponseEntity<?> actualizarUsuario(
     return ResponseEntity.ok(jwtDto);
 }
 
+@PostMapping("/{nickname}/cambiar-password")
+public ResponseEntity<?> cambiarPassword(
+    @PathVariable String nickname,
+    @Valid @RequestBody CambioPasswordDto dto,
+    BindingResult br
+) {
+  if (br.hasErrors()) {
+    return ResponseEntity.badRequest().body("Algo ha ido mal");
+  }
+  UsuarioDb u = usuarioService.findByNickname(nickname)
+    .orElseThrow(() -> new UsernameNotFoundException("No se ha encontrado el usuario"));
+  // comprueba que dto.oldPassword coincide con u.getPassword()
+  if (!passwordEncoder.matches(dto.getOldPassword(), u.getPassword())) {
+    return ResponseEntity.status(400).body("Contraseña actual incorrecta");
+  }
+  u.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+  usuarioService.save(u);
+  return ResponseEntity.ok("Contraseña cambiada");
+}
 
     @GetMapping("/usuarios")
     public ResponseEntity<ListadoRespuesta<UsuarioList>> getAllUsuarios(
