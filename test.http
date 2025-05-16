@@ -47,7 +47,7 @@ POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "nickname": "hrisi2",
+    "nickname": "hrisi1",
     "password": "Hrisi231104!"
 }
 ###
@@ -280,16 +280,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU5N
 Content-Type: application/json
 ###
 ### Actualizar mis propios datos (nickname viejo en la URL)
-PUT http://localhost:8091/api/usuarios/sofia3/actualizar HTTP/1.1
+PUT http://localhost:8091/api/usuarios/hrisi5/actualizar HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTUiLCJpYXQiOjE3NDc0MTc0MjAsImV4cCI6MTc0NzQ1MzQyMH0.8XHIfROmhBdn3HX9SvxlZu6ySRC7pjNJ5UKrbw9gR1M
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTMiLCJpYXQiOjE3NDU5NjM3NTEsImV4cCI6MTc0NTk5OTc1MX0.pA4E4yBLN8eXfICucvDzCXoHMNmlMx5aqzy9b5pKJLE
 
 {
-  "nombre": "Sofia Georgi",
-  "nickname": "sofia3",
-  "email": "nuevo@email.com",
-  "password": "NuevaPa",
-  "password2": "NuevaPa"
+  "nombre":   "Andrés González",
+  "nickname": "hrisi4",
+  "email":    "administrador@gmail.com",
+  "telefono": "+34123456789"
 }
 ###
 ### Obtener perfil del usuario autenticado

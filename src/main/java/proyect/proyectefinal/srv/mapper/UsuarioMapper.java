@@ -14,7 +14,7 @@ import proyect.proyectefinal.filters.model.FiltroBusqueda;
 import proyect.proyectefinal.filters.model.PaginaResponse;
 import proyect.proyectefinal.model.db.UsuarioDb;
 import proyect.proyectefinal.model.dto.UsuarioEdit;
-import proyect.proyectefinal.model.dto.UsuarioEditConPassword;
+import proyect.proyectefinal.model.dto.UsuarioEditSinPassword;
 import proyect.proyectefinal.model.dto.UsuarioInfo;
 import proyect.proyectefinal.model.dto.UsuarioList;
 
@@ -28,7 +28,7 @@ public interface UsuarioMapper {
     UsuarioEdit UsuarioDbToUsuarioEdit(UsuarioDb UsuarioDb);
     UsuarioDb UsuarioEditToUsuarioDb(UsuarioEdit UsuarioEdit);
 
-    UsuarioDb UsuarioEditConPasswordToUsuarioDb(UsuarioEditConPassword UsuarioEdit);
+    UsuarioDb UsuarioEditConPasswordToUsuarioDb(UsuarioEditSinPassword UsuarioEdit);
       /**
      * Convierte una página de usuarios en una respuesta paginada.
      */

@@ -2,6 +2,7 @@ package proyect.proyectefinal.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,10 +13,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,7 +37,7 @@ import proyect.proyectefinal.model.db.UsuarioDb;
 import proyect.proyectefinal.model.dto.ListadoRespuesta;
 import proyect.proyectefinal.model.dto.PaginaDto;
 import proyect.proyectefinal.model.dto.UsuarioEdit;
-import proyect.proyectefinal.model.dto.UsuarioEditConPassword;
+import proyect.proyectefinal.model.dto.UsuarioEditSinPassword;
 import proyect.proyectefinal.model.dto.UsuarioList;
 import proyect.proyectefinal.security.dto.JwtDto;
 import proyect.proyectefinal.security.service.JwtService;
@@ -50,65 +53,68 @@ public class UsuarioController {
     JwtService jwtProvider;
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    UserDetailsService userDetailsService;
+@PutMapping("/{nickname}/actualizar")
+public ResponseEntity<?> actualizarUsuario(
+        @PathVariable String nickname,
+        @Valid @RequestBody UsuarioEditSinPassword request,
+        BindingResult bindingResult) {
 
-    @PutMapping("/{nickname}/actualizar")
-    public ResponseEntity<?> actualizarUsuario(
-            @PathVariable String nickname,
-            @Valid @RequestBody UsuarioEditConPassword request,
-            BindingResult result) {
-
-        if (result.hasErrors()) {
-            List<String> errores = result.getFieldErrors()
-                    .stream()
-                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                    .toList();
-            return ResponseEntity.badRequest().body(errores);
-        }
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String nicknameAutenticado = auth.getName();
-
-        if (!nickname.equals(nicknameAutenticado)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("No tienes permisos para modificar los datos de otro usuario");
-        }
-
-        UsuarioDb usuario = usuarioService.getByNickname(nickname)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-        if (request.getNombre() != null)
-            usuario.setNombre(request.getNombre());
-        if (request.getEmail() != null)
-            usuario.setEmail(request.getEmail());
-        if (request.getNickname() != null)
-            usuario.setNickname(request.getNickname());
-
-        // Validar y actualizar contraseña
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            if (!request.getPassword().equals(request.getPassword2())) {
-                return ResponseEntity.badRequest().body("Las contraseñas introducidas no coinciden.");
-            }
-            usuario.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
-        }
-        if (request.getTelefono() != null) {
-            usuario.setTelefono(request.getTelefono());
-        }
-        
-        usuarioService.save(usuario);
-
-        // Generar nuevo token
-        String nuevoNickname = request.getNickname() != null ? request.getNickname() : nickname;
-        String nuevaPassword = request.getPassword() != null ? request.getPassword() : "";
-
-        Authentication nuevaAuth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(nuevoNickname, nuevaPassword));
-        SecurityContextHolder.getContext().setAuthentication(nuevaAuth);
-        String jwt = jwtProvider.generateToken(nuevaAuth);
-        UserDetails userDetails = (UserDetails) nuevaAuth.getPrincipal();
-        JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsername(), userDetails.getAuthorities());
-
-        return ResponseEntity.ok(jwtDto);
+    // 0) errores de validación
+    if (bindingResult.hasErrors()) {
+        List<String> errores = bindingResult.getFieldErrors().stream()
+            .map(e -> e.getField() + ": " + e.getDefaultMessage())
+            .toList();
+        return ResponseEntity.badRequest().body(Map.of("errores", errores));
     }
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String nicknameAuth = auth.getName();
+    // 1) solo el propio usuario
+    if (!nicknameAuth.equals(nickname)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                             .body("No tienes permiso para editar otro usuario");
+    }
+
+    // 2) recuperar la entidad
+    UsuarioDb usuario = usuarioService.findByNickname(nickname)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+    // 3) verificar si el email o el nickname ya están en uso por OTRO usuario
+    usuarioService.findByEmail(request.getEmail())
+        .filter(u -> !u.getId().equals(usuario.getId()))
+        .ifPresent(u -> {
+            throw new ResponseStatusException(
+              HttpStatus.BAD_REQUEST, "El email ya está en uso");
+        });
+
+    usuarioService.findByNickname(request.getNickname())
+        .filter(u -> !u.getId().equals(usuario.getId()))
+        .ifPresent(u -> {
+            throw new ResponseStatusException(
+              HttpStatus.BAD_REQUEST, "El nickname ya está en uso");
+        });
+
+    // 4) aplicar cambios
+    usuario.setNombre(request.getNombre());
+    usuario.setEmail(request.getEmail());
+    usuario.setNickname(request.getNickname());
+    usuario.setTelefono(request.getTelefono());
+
+    // 5) guardar
+    usuarioService.save(usuario);
+
+    // 6) recargar UserDetails y generar nuevo token
+    UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getNickname());
+    UsernamePasswordAuthenticationToken newAuth =
+        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    String token = jwtProvider.generateToken(newAuth);
+
+    JwtDto jwtDto = new JwtDto(token, userDetails.getUsername(), userDetails.getAuthorities());
+    return ResponseEntity.ok(jwtDto);
+}
+
 
     @GetMapping("/usuarios")
     public ResponseEntity<ListadoRespuesta<UsuarioList>> getAllUsuarios(

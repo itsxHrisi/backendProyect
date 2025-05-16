@@ -130,4 +130,15 @@ public PaginaDto<UsuarioList> findAll(Pageable paging) {
         paginaUsuarioDb.getSort());
 }
 
+@Override
+public Optional<UsuarioDb> findByNickname(String nickname) {
+        return usuarioRepository.findByNickname(nickname);
+}
+
+@Override
+public Optional<UsuarioDb> findByEmail(String email) {
+           return usuarioRepository.findByEmail(email);
+
+}
+
 }

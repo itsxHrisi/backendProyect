@@ -28,7 +28,8 @@ public interface UsuarioService {
     public boolean existsByNickname(String nickname);
     public boolean existsByEmail(String email);
     public void save(@NonNull UsuarioDb usuario);
-    
+    Optional<UsuarioDb> findByNickname(String nickname);
+    Optional<UsuarioDb> findByEmail(String email);  
     public PaginaDto<UsuarioList> findAll(Pageable paging);
 
         /**
