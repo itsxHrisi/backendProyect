@@ -41,7 +41,9 @@ import proyect.proyectefinal.model.dto.PaginaDto;
 import proyect.proyectefinal.model.dto.UsuarioEdit;
 import proyect.proyectefinal.model.dto.UsuarioEditSinPassword;
 import proyect.proyectefinal.model.dto.UsuarioList;
+import proyect.proyectefinal.repository.SesionActivaRepository;
 import proyect.proyectefinal.security.dto.JwtDto;
+import proyect.proyectefinal.security.entity.SesionActiva;
 import proyect.proyectefinal.security.service.JwtService;
 import proyect.proyectefinal.security.service.UsuarioService;
 
@@ -59,85 +61,148 @@ public class UsuarioController {
     private UserDetailsService userDetailsService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private SesionActivaRepository sesionActivaRepository;
 @PutMapping("/{nickname}/actualizar")
-public ResponseEntity<?> actualizarUsuario(
+public ResponseEntity<JwtDto> actualizarUsuario(
         @PathVariable String nickname,
         @Valid @RequestBody UsuarioEditSinPassword request,
-        BindingResult bindingResult) {
+        BindingResult bindingResult,
+        @RequestHeader("Authorization") String authHeader  // <— <===
+) {
+    // 0) Extraer token viejo
+    String oldToken = authHeader.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : authHeader;
 
-    // 0) errores de validación
+    // 1) Validación de errores de binding
     if (bindingResult.hasErrors()) {
         List<String> errores = bindingResult.getFieldErrors().stream()
             .map(e -> e.getField() + ": " + e.getDefaultMessage())
             .toList();
-        return ResponseEntity.badRequest().body(Map.of("errores", errores));
+        return ResponseEntity.badRequest()
+            .body(new JwtDto("Null o token no encontrado",null, List.of()));
     }
 
+    // 2) Solo el propio usuario
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String nicknameAuth = auth.getName();
-    // 1) solo el propio usuario
-    if (!nicknameAuth.equals(nickname)) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                             .body("No tienes permiso para editar otro usuario");
+    if (!auth.getName().equals(nickname)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    // 2) recuperar la entidad
+    // 3) Recuperar la entidad
     UsuarioDb usuario = usuarioService.findByNickname(nickname)
         .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-    // 3) verificar si el email o el nickname ya están en uso por OTRO usuario
+    // 4) Comprobar unicidad de email y nickname
     usuarioService.findByEmail(request.getEmail())
         .filter(u -> !u.getId().equals(usuario.getId()))
         .ifPresent(u -> {
             throw new ResponseStatusException(
-              HttpStatus.BAD_REQUEST, "El email ya está en uso");
+                HttpStatus.BAD_REQUEST, "El email ya está en uso");
         });
-
     usuarioService.findByNickname(request.getNickname())
         .filter(u -> !u.getId().equals(usuario.getId()))
         .ifPresent(u -> {
             throw new ResponseStatusException(
-              HttpStatus.BAD_REQUEST, "El nickname ya está en uso");
+                HttpStatus.BAD_REQUEST, "El nickname ya está en uso");
         });
 
-    // 4) aplicar cambios
+    // 5) Aplicar cambios
     usuario.setNombre(request.getNombre());
     usuario.setEmail(request.getEmail());
     usuario.setNickname(request.getNickname());
     usuario.setTelefono(request.getTelefono());
-
-    // 5) guardar
     usuarioService.save(usuario);
 
-    // 6) recargar UserDetails y generar nuevo token
-    UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getNickname());
-    UsernamePasswordAuthenticationToken newAuth =
-        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-    String token = jwtProvider.generateToken(newAuth);
+    // 6) Generar nuevo JWT
+    UserDetails userDetails = userDetailsService
+        .loadUserByUsername(usuario.getNickname());
+    UsernamePasswordAuthenticationToken newAuth = 
+        new UsernamePasswordAuthenticationToken(
+            userDetails, null, userDetails.getAuthorities());
+    String newToken = jwtProvider.generateToken(newAuth);
 
-    JwtDto jwtDto = new JwtDto(token, userDetails.getUsername(), userDetails.getAuthorities());
+    // 7) Actualizar SesionActiva
+    sesionActivaRepository.findByTokenSesion(oldToken)
+        .ifPresent(oldSesion -> {
+            sesionActivaRepository.delete(oldSesion);
+        });
+    // crear nueva
+    SesionActiva nuevaSesion = new SesionActiva(usuario, newToken);
+    sesionActivaRepository.save(nuevaSesion);
+
+    // 8) Devolver el nuevo token al cliente
+    JwtDto jwtDto = new JwtDto(newToken,
+        userDetails.getUsername(),
+        userDetails.getAuthorities());
     return ResponseEntity.ok(jwtDto);
 }
 
-@PostMapping("/{nickname}/cambiar-password")
+@PutMapping("/{nickname}/cambiar-password")
 public ResponseEntity<?> cambiarPassword(
     @PathVariable String nickname,
     @Valid @RequestBody CambioPasswordDto dto,
-    BindingResult br
+    BindingResult br,
+    @RequestHeader("Authorization") String authHeader
 ) {
-  if (br.hasErrors()) {
-    return ResponseEntity.badRequest().body("Algo ha ido mal");
-  }
-  UsuarioDb u = usuarioService.findByNickname(nickname)
-    .orElseThrow(() -> new UsernameNotFoundException("No se ha encontrado el usuario"));
-  // comprueba que dto.oldPassword coincide con u.getPassword()
-  if (!passwordEncoder.matches(dto.getOldPassword(), u.getPassword())) {
-    return ResponseEntity.status(400).body("Contraseña actual incorrecta");
-  }
-  u.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-  usuarioService.save(u);
-  return ResponseEntity.ok("Contraseña cambiada");
+    // 1️⃣ Errores de validación de DTO
+    if (br.hasErrors()) {
+        List<String> errores = br.getFieldErrors()
+            .stream()
+            .map(e -> e.getField() + ": " + e.getDefaultMessage())
+            .toList();
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("errores", errores));
+    }
+
+    // 2️⃣ Sólo el propio usuario
+    String nicknameAuth = SecurityContextHolder.getContext()
+        .getAuthentication().getName();
+    if (!nicknameAuth.equals(nickname)) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("No tienes permiso para cambiar la contraseña de otro usuario");
+    }
+
+    // 3️⃣ Comprobar que las dos contraseñas coinciden
+    if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+        return ResponseEntity.badRequest()
+                .body("Las contraseñas no coinciden");
+    }
+
+    // 4️⃣ Recuperar entidad y actualizar contraseña
+    UsuarioDb usuario = usuarioService.findByNickname(nickname)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+    usuario.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+    usuarioService.save(usuario);
+
+    // 5️⃣ Generar nuevo JWT
+    UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getNickname());
+    UsernamePasswordAuthenticationToken newAuth =
+        new UsernamePasswordAuthenticationToken(
+            userDetails, null, userDetails.getAuthorities()
+        );
+    String nuevoJwt = jwtProvider.generateToken(newAuth);
+
+    // 6️⃣ Eliminar la sesión activa vieja
+    String viejoToken = authHeader.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : authHeader;
+    sesionActivaRepository.findByTokenSesion(viejoToken)
+        .ifPresent(sesionActivaRepository::delete);
+
+    // 7️⃣ Crear y guardar la nueva sesión activa
+    SesionActiva nuevaSesion = new SesionActiva(usuario, nuevoJwt);
+    sesionActivaRepository.save(nuevaSesion);
+
+    // 8️⃣ Devolver el nuevo JwtDto
+    JwtDto jwtDto = new JwtDto(nuevoJwt,
+        userDetails.getUsername(),
+        userDetails.getAuthorities());
+    return ResponseEntity.ok(jwtDto);
 }
+
 
     @GetMapping("/usuarios")
     public ResponseEntity<ListadoRespuesta<UsuarioList>> getAllUsuarios(
