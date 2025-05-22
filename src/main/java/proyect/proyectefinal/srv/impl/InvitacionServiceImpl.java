@@ -9,12 +9,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import proyect.proyectefinal.model.db.GrupoFamiliar;
 import proyect.proyectefinal.model.db.Invitacion;
 import proyect.proyectefinal.model.db.RolDb;
 import proyect.proyectefinal.model.db.UsuarioDb;
 import proyect.proyectefinal.model.dto.InvitacionRequest;
+import proyect.proyectefinal.model.dto.InvitacionesList;
+import proyect.proyectefinal.model.dto.PaginaDto;
+import proyect.proyectefinal.model.dto.UsuarioList;
 import proyect.proyectefinal.repository.GrupoFamiliarRepository;
 import proyect.proyectefinal.repository.InvitacionRepository;
 import proyect.proyectefinal.repository.RolRepository;
@@ -22,6 +27,7 @@ import proyect.proyectefinal.repository.UsuarioRepository;
 import proyect.proyectefinal.security.service.UsuarioService;
 import proyect.proyectefinal.service.InvitacionService;
 import proyect.proyectefinal.srv.mapper.InvitacionMapper;
+import proyect.proyectefinal.srv.mapper.UsuarioMapper;
 
 @Service
 public class InvitacionServiceImpl implements InvitacionService {
@@ -84,6 +90,30 @@ public class InvitacionServiceImpl implements InvitacionService {
     public List<Invitacion> getInvitacionesPorGrupo(Long grupoId) {
         return invitacionRepository.findByGrupoId(grupoId);
     }
+ @Override
+    public PaginaDto<InvitacionesList> findAll(Pageable paging) {
+        // 1) Extraer usuario autenticado
+        String nickname = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 2) Pedir sólo las suyas
+        Page<Invitacion> pagina = invitacionRepository
+            .findAllByNicknameDestinoIgnoreCase(nickname, paging);
+
+        // 3) Mapear al DTO de salida
+        List<InvitacionesList> content = InvitacionMapper.INSTANCE
+            .invitacionToInvitacionesList(pagina.getContent());
+
+        // 4) Construir y devolver PaginaDto
+        return new PaginaDto<>(
+            pagina.getNumber(),
+            pagina.getSize(),
+            pagina.getTotalElements(),
+            pagina.getTotalPages(),
+            content,
+            pagina.getSort()
+        );
+    }
+
 
     @Override
 @Transactional

@@ -24,7 +24,7 @@ Content-Type: application/json
 {
     "nickname": "andres",
     "nombre": "hristsiyan\nTrayanov",
-    "email": "hristiyantg@gmail.com",
+    "email": "hristiyantg3@gmail.com",
     "password": "Hrisi231104!",
     "telefono":"678 591 444"
 
@@ -124,7 +124,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc2OTAxMDksImV4cCI6MTc0NzcyNjEwOX0.RjRLLanVTufCUCJS4l8pFB63-xj-8mQByxDMTyBHPC4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc5Mzc2MjQsImV4cCI6MTc0Nzk3MzYyNH0.qc1wVAwCDx37JF2-a-IogtBimwR_dyga_Fu0ZnFZK28
 
 {
   "nombre": "Familia Trayanov2"
@@ -235,10 +235,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc2OTAxMDksImV4cCI6MTc0NzcyNjEwOX0.RjRLLanVTufCUCJS4l8pFB63-xj-8mQByxDMTyBHPC4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc5MzgxMjUsImV4cCI6MTc0Nzk3NDEyNX0.Lar4TRAGhtdDND00w1Svk3Bp7sQ3VUPapIAwzK8iHCk
 
 {
-  "nickname": "sofia2",
+  "nickname": "andres",
   "grupoId": 1
 }
 
@@ -246,6 +246,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc2O
 ### Obtener invitaciones del grupo con ID 1
 GET http://localhost:8091/api/invitaciones/grupo/1 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0Mzg1ODAsImV4cCI6MTc0NTQ3NDU4MH0.RKGTRyu1PMudULyTh0hPA4RaxeqfWuoABXhuPgi5fQ8
+
+###
+### Obtener invitaciones paginadas
+GET http://localhost:8091/api/invitaciones HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDc5MzgyMDUsImV4cCI6MTc0Nzk3NDIwNX0.oHrRN8yY93uvKgdOn7r3QLPcOVMzOcmMcicpis_sJT0
 
 ###
 ### Marcar invitación con ID 5 como aceptada
