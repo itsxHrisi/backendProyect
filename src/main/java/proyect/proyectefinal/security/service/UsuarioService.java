@@ -33,7 +33,7 @@ public interface UsuarioService {
     public PaginaDto<UsuarioList> findAll(Pageable paging);
 
         /**
-         * Busca jugadores aplicando filtros, paginación y ordenación a partir de parámetros individuales.
+         * Busca usuarios aplicando filtros, paginación y ordenación a partir de parámetros individuales.
          * 
          * @param filter Array de strings con los filtros en formato "campo:operador:valor"
          * @param page Número de página (zero-based)
@@ -44,7 +44,7 @@ public interface UsuarioService {
          */
         public PaginaResponse<UsuarioList> findAll(List<String> filter, int page, int size, List<String> sort) throws FiltroException;
         /**
-         * Busca jugadores aplicando filtros, paginación y ordenación a partir de una petición estructurada.
+         * Busca usuarios aplicando filtros, paginación y ordenación a partir de una petición estructurada.
          * 
          * @param peticionListadoFiltrado Objeto que encapsula los criterios de búsqueda (nº pagina, tamaño de la página, lista de filtros y lista de ordenaciones)
          * @return PaginaResponse con la lista de jugadores filtrada y paginada

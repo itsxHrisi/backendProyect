@@ -47,7 +47,7 @@ POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "nickname": "hrisi1",
+    "nickname": "hrisi2",
     "password": "Hrisi231104!"
 }
 ###
@@ -65,7 +65,7 @@ POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "nickname": "hrisi3",
+    "nickname": "hrisi2",
     "password": "Hrisi231104!"
 }
 ###
@@ -124,7 +124,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDU5MjgsImV4cCI6MTc0NjY4MTkyOH0.x-tNi1ygAGlaNKONLw1PUbjdxPna7Rn8KFDyNRunV_c
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc2OTAxMDksImV4cCI6MTc0NzcyNjEwOX0.RjRLLanVTufCUCJS4l8pFB63-xj-8mQByxDMTyBHPC4
 
 {
   "nombre": "Familia Trayanov2"
@@ -214,8 +214,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzN
 }
 ###
 ## Eliminar grupo
-DELETE http://localhost:8091/api/grupos/1 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUyNTc1MTgsImV4cCI6MTc0NTI5MzUxOH0.68KBlr8CwrklAz-6ftojIvWWYMYrv5BSYQj53XZ216A
+DELETE http://localhost:8091/api/grupos/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc5MzU2NzAsImV4cCI6MTc0Nzk3MTY3MH0.31LmXJWU91CeY1xiH_rxdwyTXwyBh_1jGI8AHaOo3Kw
 
 
 ###
@@ -235,7 +235,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY0Nzc3NTksImV4cCI6MTc0NjUxMzc1OX0.EwferH7ziCvihkrrX-8O5p_VBF_PAS6JVDwYkMEpix0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc2OTAxMDksImV4cCI6MTc0NzcyNjEwOX0.RjRLLanVTufCUCJS4l8pFB63-xj-8mQByxDMTyBHPC4
 
 {
   "nickname": "sofia2",
@@ -293,7 +293,7 @@ Content-Type: application/json
 ###
 ### Obtener perfil del usuario autenticado
 GET http://localhost:8091/api/usuarios/perfil HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NjAwNjIsImV4cCI6MTc0NTk5NjA2Mn0.oDJI4G-b5yaz8dskACQoPzePJQhlgHe21M7kgy1GVuI
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc3NzUzMTYsImV4cCI6MTc0NzgxMTMxNn0.eTt1EWPmVdLDIiklkIP-134cCx7lWAoBpUh9ycchw4w
 
 
 
@@ -369,3 +369,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2N
 ###Obtener gastos filtrados por tipo y subtipo
 GET http://localhost:8091/api/gastos/page?page=0&size=20&sort=fecha,asc&tipoGasto=LUJO&subtipo=ESPECTACULOS HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDgzMzgsImV4cCI6MTc0NjY4NDMzOH0.flJ_dLmBVAvvH6n2fYffeAkS6tV2dF7Nrq_eFw32jW8
+
+
+
+###
+###
+GET http://localhost:8091/api/gastos/filter?nicknameDestino:IGUAL:sofia2&filter=grupoNombre:IGUAL:Fam&page=0&size=10&sort=fecha,desc&sort=fecha,desc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDc2OTAzMjgsImV4cCI6MTc0NzcyNjMyOH0.CprFVHnfSM4ZDBzHpt0Y2RoGRaFdVWIlneMp-tTvcAc

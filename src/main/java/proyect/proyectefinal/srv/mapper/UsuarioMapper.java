@@ -1,8 +1,6 @@
 package proyect.proyectefinal.srv.mapper;
 
-
 import java.util.List;
-
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,18 +16,24 @@ import proyect.proyectefinal.model.dto.UsuarioEditSinPassword;
 import proyect.proyectefinal.model.dto.UsuarioInfo;
 import proyect.proyectefinal.model.dto.UsuarioList;
 
-
 @Mapper
 public interface UsuarioMapper {
     UsuarioMapper INSTANCE = Mappers.getMapper(UsuarioMapper.class);
+
     List<UsuarioList> usuariosDbToUsuariosList(List<UsuarioDb> usuariosDb);
+
+    @Mapping(target = "grupoFamiliarId", source = "grupoFamiliar.id")
+    @Mapping(target = "grupoFamiliarNombre", source = "grupoFamiliar.nombre")
     @Mapping(target = "roles", source = "roles")
     UsuarioInfo usuarioDbToUsuarioInfo(UsuarioDb usuarioDb);
+
     UsuarioEdit UsuarioDbToUsuarioEdit(UsuarioDb UsuarioDb);
+
     UsuarioDb UsuarioEditToUsuarioDb(UsuarioEdit UsuarioEdit);
 
     UsuarioDb UsuarioEditConPasswordToUsuarioDb(UsuarioEditSinPassword UsuarioEdit);
-      /**
+
+    /**
      * Convierte una página de usuarios en una respuesta paginada.
      */
     static PaginaResponse<UsuarioList> pageToPaginaResponse(
@@ -43,7 +47,6 @@ public interface UsuarioMapper {
                 page.getTotalPages(),
                 UsuarioMapper.INSTANCE.usuariosDbToUsuariosList(page.getContent()),
                 filtros,
-                ordenaciones
-        );
+                ordenaciones);
     }
 }

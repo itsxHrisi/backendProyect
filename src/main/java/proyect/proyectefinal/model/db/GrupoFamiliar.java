@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -26,9 +27,10 @@ public class GrupoFamiliar {
 
     @OneToOne
     @JoinColumn(name = "administrador_id")
+    @JsonIgnoreProperties("grupoFamiliar")
     private UsuarioDb administrador;
 
     @OneToMany(mappedBy = "grupoFamiliar")
-    @JsonManagedReference
+    @JsonIgnoreProperties("grupoFamiliar")
     private List<UsuarioDb> usuarios;
 }

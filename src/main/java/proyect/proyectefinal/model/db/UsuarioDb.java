@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,7 +49,7 @@ public class UsuarioDb {
 
     @ManyToOne
     @JoinColumn(name = "grupo_familiar_id")
-    @JsonBackReference
+    @JsonIgnoreProperties
     private GrupoFamiliar grupoFamiliar;
 
     @NotNull

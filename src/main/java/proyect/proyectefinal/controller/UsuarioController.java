@@ -40,12 +40,14 @@ import proyect.proyectefinal.model.dto.ListadoRespuesta;
 import proyect.proyectefinal.model.dto.PaginaDto;
 import proyect.proyectefinal.model.dto.UsuarioEdit;
 import proyect.proyectefinal.model.dto.UsuarioEditSinPassword;
+import proyect.proyectefinal.model.dto.UsuarioInfo;
 import proyect.proyectefinal.model.dto.UsuarioList;
 import proyect.proyectefinal.repository.SesionActivaRepository;
 import proyect.proyectefinal.security.dto.JwtDto;
 import proyect.proyectefinal.security.entity.SesionActiva;
 import proyect.proyectefinal.security.service.JwtService;
 import proyect.proyectefinal.security.service.UsuarioService;
+import proyect.proyectefinal.srv.mapper.UsuarioMapper;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -224,16 +226,28 @@ public ResponseEntity<?> cambiarPassword(
         return ResponseEntity.ok(response);
     }
 
+    // @GetMapping("/perfil")
+    // public ResponseEntity<UsuarioDb> verPerfil() {
+    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    //     String nicknameAuth = auth.getName();
+
+    //     UsuarioDb usuario = usuarioService.getByNickname(nicknameAuth)
+    //             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    //     return ResponseEntity.ok(usuario);
+    // }
+
     @GetMapping("/perfil")
-    public ResponseEntity<UsuarioDb> verPerfil() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String nicknameAuth = auth.getName();
+public ResponseEntity<UsuarioInfo> verPerfil() {
+  String nicknameAuth = SecurityContextHolder.getContext().getAuthentication().getName();
+  UsuarioDb usuario = usuarioService.getByNickname(nicknameAuth)
+      .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        UsuarioDb usuario = usuarioService.getByNickname(nicknameAuth)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+  // Usamos el singleton de MapStruct en lugar de inyectar
+  UsuarioInfo info = UsuarioMapper.INSTANCE.usuarioDbToUsuarioInfo(usuario);
 
-        return ResponseEntity.ok(usuario);
-    }
+  return ResponseEntity.ok(info);
+}
    /**
      * 2a) GET /api/usuarios/filter
      *     Devuelve usuarios paginados aplicando filtros por query-params:
