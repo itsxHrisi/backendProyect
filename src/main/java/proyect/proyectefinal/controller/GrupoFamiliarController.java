@@ -48,7 +48,7 @@ public class GrupoFamiliarController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Grupo familiar no encontrado");
         }
     }
-
+    /*/sadsa */
     @PostMapping
     public ResponseEntity<?> createGrupoFamiliar(@RequestBody GrupoFamiliar grupoFamiliar) {
         // Obtener el usuario autenticado
@@ -60,7 +60,7 @@ public class GrupoFamiliarController {
         // Asignar administrador
         grupoFamiliar.setAdministrador(usuario);
         GrupoFamiliar grupoGuardado = grupoFamiliarService.save(grupoFamiliar);
-
+        System.out.println("Actualizar");
         // Asignar grupo al usuario
         usuario.setGrupoFamiliar(grupoGuardado);
 // Asignar rol ROL_Padre
