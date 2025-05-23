@@ -19,7 +19,7 @@ import proyect.proyectefinal.model.db.Invitacion.EstadoInvitacion;
 @Data
 @Builder
 public class InvitacionesList {
-    
+    private Long id;
     private String nicknameDestino;
     private GrupoFamiliar grupo;
     private EstadoInvitacion estado;

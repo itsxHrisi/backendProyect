@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 
+import proyect.proyectefinal.exception.FiltroException;
+import proyect.proyectefinal.filters.model.PaginaResponse;
 import proyect.proyectefinal.helper.PaginationHelper;
 import proyect.proyectefinal.model.db.Invitacion;
 import proyect.proyectefinal.model.db.UsuarioDb;
@@ -78,6 +80,22 @@ public class InvitacionController {
             pagina.getContent()
         );
         return ResponseEntity.ok(resp);
+    }
+/**
+     *  GET /api/invitaciones/filter
+     *  Devuelve invitaciones paginadas aplicando filtros por query-params:
+     *    ?filter=campo:OPERADOR:valor
+     */
+    @GetMapping("/filter")
+    public ResponseEntity<PaginaResponse<InvitacionesList>> getInvitacionesFiltradas(
+            @RequestParam List<String> filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") List<String> sort
+    ) throws FiltroException {
+        PaginaResponse<InvitacionesList> resultado =
+            invitacionService.findAll(filter, page, size, sort);
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/usuario")

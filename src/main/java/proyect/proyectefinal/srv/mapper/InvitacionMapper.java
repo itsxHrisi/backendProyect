@@ -6,7 +6,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
 
+import proyect.proyectefinal.filters.model.FiltroBusqueda;
+import proyect.proyectefinal.filters.model.PaginaResponse;
 import proyect.proyectefinal.model.db.Invitacion;
 import proyect.proyectefinal.model.db.UsuarioDb;
 import proyect.proyectefinal.model.dto.InvitacionEdit;
@@ -32,4 +35,23 @@ public interface InvitacionMapper {
     List<InvitacionesList>invitacionToInvitacionesList(List<Invitacion> invitaciones);
 
     List<InvitacionInfo> invitacionesToInvitacionInfoList(List<Invitacion> invitaciones);
+    default PaginaResponse<InvitacionesList> pageToPaginaResponse(
+        Page<Invitacion> page,
+        List<FiltroBusqueda> filtros,
+        List<String> sort
+) {
+    List<InvitacionesList> content =
+        invitacionToInvitacionesList(page.getContent());
+
+    return new PaginaResponse<>(
+        page.getNumber(),
+        page.getSize(),
+        page.getTotalElements(),
+        page.getTotalPages(),      // ← ESTE parámetro faltaba
+        content,
+        filtros,
+        sort
+    );
+}
+
 }

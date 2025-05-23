@@ -63,7 +63,10 @@ public class GrupoFamiliarController {
 
         // Asignar grupo al usuario
         usuario.setGrupoFamiliar(grupoGuardado);
-
+// Asignar rol ROL_Padre
+        RolDb rolPadre = rolRepository.findByNombre(RolNombre.ROL_PADRE)
+                .orElseThrow(() -> new RuntimeException("Rol ROL_PADRE no encontrado"));
+        usuario.getRoles().add(rolPadre);
         // Asignar rol ROL_ADMIN
         RolDb rolAdmin = rolRepository.findByNombre(RolNombre.ROL_ADMIN)
                 .orElseThrow(() -> new RuntimeException("Rol ROL_ADMIN no encontrado"));

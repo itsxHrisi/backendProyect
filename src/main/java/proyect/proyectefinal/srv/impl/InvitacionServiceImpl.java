@@ -9,9 +9,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.core.Authentication;
+
+import proyect.proyectefinal.exception.FiltroException;
+import proyect.proyectefinal.filters.model.PaginaResponse;
+import proyect.proyectefinal.filters.model.PeticionListadoFiltrado;
+import proyect.proyectefinal.filters.specification.FiltroBusquedaSpecification;
+import proyect.proyectefinal.filters.utils.PaginationFactory;
+import proyect.proyectefinal.filters.utils.PeticionListadoFiltradoConverter;
 import proyect.proyectefinal.model.db.GrupoFamiliar;
 import proyect.proyectefinal.model.db.Invitacion;
 import proyect.proyectefinal.model.db.RolDb;
@@ -41,8 +52,16 @@ public class InvitacionServiceImpl implements InvitacionService {
     private UsuarioService usuarioService;
     @Autowired
     private RolRepository rolRepository;
-
+    
+private final PeticionListadoFiltradoConverter peticionConverter;
+    private final PaginationFactory paginationFactory;
   
+ public InvitacionServiceImpl(
+                                 PeticionListadoFiltradoConverter peticionConverter,
+                                 PaginationFactory paginationFactory) {
+        this.peticionConverter   = peticionConverter;
+        this.paginationFactory   = paginationFactory;
+    }
 
     @Override
     public String crearInvitacion(InvitacionRequest request) {
@@ -115,6 +134,86 @@ public class InvitacionServiceImpl implements InvitacionService {
     }
 
 
+ // src/main/java/proyect/proyectefinal/srv/impl/InvitacionServiceImpl.java
+@Override
+public PaginaResponse<InvitacionesList> findAll(
+        List<String> filter, int page, int size, List<String> sort
+) throws FiltroException {
+    // 1) Convierte params a PeticionListadoFiltrado
+    PeticionListadoFiltrado peticion = peticionConverter
+        .convertFromParams(filter, page, size, sort);
+
+    // 2) Construye pageable
+    Pageable pageable = paginationFactory.createPageable(peticion);
+
+    // 3) Construye Specification genérico con tus filtros
+    Specification<Invitacion> spec = 
+        new FiltroBusquedaSpecification<>(peticion.getListaFiltros());
+
+    // 4) AÑADE SIEMPRE un filtro adicional para quedarte solo con las invitaciones 
+    //    cuyo nicknameDestino sea el del usuario autenticado:
+    String nicknameAuth = 
+      SecurityContextHolder.getContext().getAuthentication().getName();
+    Specification<Invitacion> authSpec = (root, cq, cb) -> 
+      cb.equal(root.get("nicknameDestino"), nicknameAuth);
+
+    // combinas ambos specs:
+    spec = spec.and(authSpec);
+
+    // 5) Ejecuta la consulta paginada
+    Page<Invitacion> pageInv = invitacionRepository.findAll(spec, pageable);
+
+    // 6) Mapea a tu DTO y devuelve
+    return InvitacionMapper.INSTANCE.pageToPaginaResponse(
+        pageInv,
+        peticion.getListaFiltros(),
+        peticion.getSort()
+    );
+}
+
+
+    @Override
+    public PaginaResponse<InvitacionesList> findAll(
+            PeticionListadoFiltrado peticionListadoFiltrado
+    ) throws FiltroException {
+        try {
+            // construir pageable
+            Pageable pageable = paginationFactory.createPageable(peticionListadoFiltrado);
+            // construir Specification genérica
+            Specification<Invitacion> spec =
+                new FiltroBusquedaSpecification<>(peticionListadoFiltrado.getListaFiltros());
+            // ejecutar query
+            Page<Invitacion> page = invitacionRepository.findAll(spec, pageable);
+            // mapear a DTO y devolver PaginaResponse
+            return InvitacionMapper.INSTANCE.pageToPaginaResponse(
+                page,
+                peticionListadoFiltrado.getListaFiltros(),
+                peticionListadoFiltrado.getSort()
+            );
+        } catch (JpaSystemException e) {
+            String cause = e.getRootCause() != null && e.getRootCause().getMessage() != null
+                         ? e.getRootCause().getMessage()
+                         : e.getMessage();
+            throw new FiltroException(
+                "BAD_OPERATOR_FILTER",
+                "Operación no permitida sobre el atributo",
+                cause
+            );
+        } catch (PropertyReferenceException e) {
+            throw new FiltroException(
+                "BAD_ATTRIBUTE_ORDER",
+                "Atributo de ordenación desconocido",
+                e.getMessage()
+            );
+        } catch (InvalidDataAccessApiUsageException e) {
+            throw new FiltroException(
+                "BAD_ATTRIBUTE_FILTER",
+                "Atributo de filtrado desconocido",
+                e.getMessage()
+            );
+        }
+    }
+    
     @Override
 @Transactional
 public Optional<Invitacion> actualizarEstado(Long id, Invitacion.EstadoInvitacion nuevoEstado) {

@@ -250,8 +250,7 @@ public ResponseEntity<UsuarioInfo> verPerfil() {
 }
    /**
      * 2a) GET /api/usuarios/filter
-     *     Devuelve usuarios paginados aplicando filtros por query-params:
-     *       ?filter=campo:OPERADOR:valor
+     *     Devuelve usuarios paginados aplicando filtros por query-params:?filter=campo:OPERADOR:valor
      */
     @GetMapping("/filter")
     public ResponseEntity<PaginaResponse<UsuarioList>> getUsuariosFiltrados(
