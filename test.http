@@ -124,10 +124,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgwMjMwNzksImV4cCI6MTc0ODA1OTA3OX0.tIZ5CNfzZODxqN6fVZoaQBwT2lYbNL8ZwhxSaAk-rj4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgwMzgxNTksImV4cCI6MTc0ODA3NDE1OX0.AXzFKbgj7tLrzgoq1eJ13FFXX-kwx_TIojIIIGh2NfQ
 
 {
-  "nombre": "Familia Trayanov2"
+  "nombre": "Familia Trayanov5"
 }
 ###
 ## Obtener grupo por ID
@@ -214,8 +214,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzN
 }
 ###
 ## Eliminar grupo
-DELETE http://localhost:8091/api/grupos/2 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc5MzU2NzAsImV4cCI6MTc0Nzk3MTY3MH0.31LmXJWU91CeY1xiH_rxdwyTXwyBh_1jGI8AHaOo3Kw
+DELETE http://localhost:8091/api/grupos/4 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgwMzgwNTksImV4cCI6MTc0ODA3NDA1OX0.kSChLCdBptavFTKjsxQaHwXZzXtUQ1anPPInRoPCPXI
 
 
 ###
@@ -235,11 +235,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgwMjMwNzksImV4cCI6MTc0ODA1OTA3OX0.tIZ5CNfzZODxqN6fVZoaQBwT2lYbNL8ZwhxSaAk-rj4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgwMzgxNTksImV4cCI6MTc0ODA3NDE1OX0.AXzFKbgj7tLrzgoq1eJ13FFXX-kwx_TIojIIIGh2NfQ
 
 {
   "nickname": "sofia2",
-  "grupoId": 2
+  "grupoId": 6
 }
 
 ###

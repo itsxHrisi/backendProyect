@@ -264,7 +264,7 @@ public class GastoController {
             case LUJO -> Set.of(
                     SubtipoGasto.ESPECTACULOS, SubtipoGasto.ESTETICA, SubtipoGasto.MAQUILLAJE, SubtipoGasto.PARKING,
                     SubtipoGasto.REGALOS, SubtipoGasto.RESTAURANTES, SubtipoGasto.ROPA_COMPLEMENTOS,
-                    SubtipoGasto.SUBS_OCIO,
+                    SubtipoGasto.SUBSCRIPCIONES_OCIO,
                     SubtipoGasto.VIAJES, SubtipoGasto.SALIDAS_OCIO, SubtipoGasto.TELEFONO_INTERNET,
                     SubtipoGasto.LOTERIA,
                     SubtipoGasto.FALLA, SubtipoGasto.LUJO_NIÑOS).contains(subtipo);
