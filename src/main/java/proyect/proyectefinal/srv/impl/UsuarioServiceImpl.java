@@ -72,6 +72,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public List<UsuarioDb> findByGrupoFamiliarId(Long grupoId) {
+        return usuarioRepository.findByGrupoFamiliarId(grupoId);
+    }
+    @Override
     public PaginaResponse<UsuarioList> findAll(List<String> filter, int page, int size, List<String> sort) 
             throws FiltroException {
         /** 'peticionConverter' está en el constructor del service porque utilizando una buena arquitectura

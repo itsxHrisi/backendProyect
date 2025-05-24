@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 public interface UsuarioRepository extends JpaRepository<UsuarioDb, Long>,JpaSpecificationExecutor<UsuarioDb>{
     Optional<UsuarioDb> findByNickname(String nickname);
     Optional<UsuarioDb> findByEmail(String email);
+    List<UsuarioDb> findByGrupoFamiliarId(Long grupoId);
 
     boolean existsByNickname(String nickname);
     boolean existsByEmail(String email);

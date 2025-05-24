@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import proyect.proyectefinal.model.db.GrupoFamiliar;
 import proyect.proyectefinal.model.db.RolDb;
 import proyect.proyectefinal.model.db.UsuarioDb;
+import proyect.proyectefinal.model.enums.RolNombre;
 import proyect.proyectefinal.repository.GrupoFamiliarRepository;
 import proyect.proyectefinal.repository.RolRepository;
 import proyect.proyectefinal.repository.UsuarioRepository;
@@ -68,41 +69,46 @@ public class GrupoFamiliarServiceImpl implements GrupoFamiliarService {
 
         grupoFamiliarRepository.delete(grupo);
     }
-public String asignarRol(String nicknameDestino, String rolStr) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String nicknameActual = auth.getName();
-    UsuarioDb admin = usuarioService.getByNickname(nicknameActual)
-            .orElseThrow(() -> new UsernameNotFoundException("Usuario autenticado no encontrado"));
+    @Override
+    @Transactional
+    public String asignarRol(String nicknameDestino, String rolStr) {
+        // 1) Admin autenticado
+        String nicknameActual = SecurityContextHolder.getContext().getAuthentication().getName();
+        UsuarioDb admin = usuarioService.getByNickname(nicknameActual)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario autenticado no encontrado"));
 
-    UsuarioDb destino = usuarioService.getByNickname(nicknameDestino)
-            .orElseThrow(() -> new RuntimeException("Usuario destino no encontrado"));
+        // 2) Usuario destino
+        UsuarioDb destino = usuarioService.getByNickname(nicknameDestino)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario destino no encontrado"));
 
-    GrupoFamiliar grupo = admin.getGrupoFamiliar();
-    if (grupo == null || !grupo.getAdministrador().getId().equals(admin.getId())) {
-        throw new RuntimeException("No tienes permisos para asignar roles");
+        // 3) Solo el admin de ese grupo
+        GrupoFamiliar grupo = admin.getGrupoFamiliar();
+        if (grupo == null || !grupo.getAdministrador().getId().equals(admin.getId())) {
+            throw new RuntimeException("No tienes permisos para asignar roles");
+        }
+
+        // 4) Destino debe estar en el mismo grupo
+        if (destino.getGrupoFamiliar() == null
+         || !destino.getGrupoFamiliar().getId().equals(grupo.getId())) {
+            throw new RuntimeException("El usuario no pertenece al mismo grupo");
+        }
+
+        // 5) Convertir el parámetro a nuestro enum RolNombre
+        RolNombre rolEnum;
+        try {
+            rolEnum = RolNombre.valueOf("ROL_" + rolStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Rol no válido. Debe ser 'PADRE' o 'HIJO'");
+        }
+
+        // 6) Buscar la entidad RolDb por enum
+        RolDb rolAsignar = rolRepository.findByNombre(rolEnum)
+                .orElseThrow(() -> new RuntimeException("Rol " + rolEnum + " no encontrado"));
+
+        // 7) Asignarlo y guardar
+        destino.getRoles().add(rolAsignar);
+        usuarioService.save(destino);
+
+        return "Rol " + rolEnum + " asignado correctamente a " + nicknameDestino;
     }
-
-    // Validar que el destino esté en el grupo
-    if (!destino.getGrupoFamiliar().getId().equals(grupo.getId())) {
-        throw new RuntimeException("El usuario no pertenece al mismo grupo");
-    }
-
-    // Validar rol
-    String rolFormateado = rolStr.toUpperCase();
-    RolDb rolAsignar;
-    if (rolFormateado.equals("PADRE")) {
-        rolAsignar = rolRepository.findByNombre("ROL_PADRE")
-                .orElseThrow(() -> new RuntimeException("Rol ROL_PADRE no encontrado"));
-    } else if (rolFormateado.equals("HIJO")) {
-        rolAsignar = rolRepository.findByNombre("ROL_HIJO")
-                .orElseThrow(() -> new RuntimeException("Rol ROL_HIJO no encontrado"));
-    } else {
-        throw new RuntimeException("Rol no válido. Debe ser 'PADRE' o 'HIJO'");
-    }
-
-    destino.getRoles().add(rolAsignar);
-    usuarioRepository.save(destino);
-
-    return "Rol asignado correctamente";
-}
 }

@@ -23,6 +23,7 @@ import java.util.Optional;
 @Service
 @Transactional //Mantiene la coherencia de la BD si hay varios accesos de escritura concurrentes
 public interface UsuarioService {
+    List<UsuarioDb> findByGrupoFamiliarId(Long grupoId);
 
     public Optional<UsuarioDb> getByNickname(String nickname);
     public boolean existsByNickname(String nickname);

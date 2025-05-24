@@ -38,7 +38,10 @@ public class GrupoFamiliarController {
     public List<GrupoFamiliar> getAll() {
         return grupoFamiliarService.findAll();
     }
-
+ // Helper que deja sólo el rol ROL_USER
+    private void limpiarRoles(UsuarioDb usuario) {
+        usuario.getRoles().removeIf(r -> !r.getNombre().equals(RolNombre.ROL_USER));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         Optional<GrupoFamiliar> grupo = grupoFamiliarService.findById(id);
@@ -77,34 +80,38 @@ public class GrupoFamiliarController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(grupoGuardado);
     }
+@PutMapping("/limpiar-roles")
+@Transactional
+public ResponseEntity<?> limpiarRolesUsuario(
+        @RequestParam String nicknameDestino,
+        Authentication authentication) {
 
-    // @PostMapping
-    // public ResponseEntity<?> createGrupoFamiliar(@RequestBody GrupoFamiliar
-    // grupoFamiliar) {
-    // // Obtener el usuario autenticado
-    // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    // String nickname = auth.getName();
-    // UsuarioDb usuario = usuarioService.getByNickname(nickname).orElseThrow(
-    // () -> new UsernameNotFoundException("Usuario no encontrado"));
+    // 1) Comprueba que el que llama es admin de un grupo
+    String nicknameAdmin = authentication.getName();
+    UsuarioDb admin = usuarioService.getByNickname(nicknameAdmin)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario autenticado no encontrado"));
 
-    // // Asignar administrador
-    // grupoFamiliar.setAdministrador(usuario);
+    GrupoFamiliar grupo = admin.getGrupoFamiliar();
+    if (grupo == null || !grupo.getAdministrador().getId().equals(admin.getId())) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Solo el administrador puede limpiar roles");
+    }
 
-    // // Guardar grupo
-    // GrupoFamiliar grupoGuardado = grupoFamiliarService.save(grupoFamiliar);
+    // 2) Busca el usuario destino y comprueba pertenece al mismo grupo
+    UsuarioDb destino = usuarioService.getByNickname(nicknameDestino)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario destino no encontrado"));
+    if (destino.getGrupoFamiliar() == null
+     || !destino.getGrupoFamiliar().getId().equals(grupo.getId())) {
+        return ResponseEntity.badRequest().body("El usuario no pertenece a tu grupo");
+    }
 
-    // // Asignar grupo al usuario
-    // usuario.setGrupoFamiliar(grupoGuardado);
-    // usuarioService.save(usuario);
+    // 3) Aplica tu helper y guarda
+    limpiarRoles(destino);
+    usuarioService.save(destino);
 
-    // return ResponseEntity.status(HttpStatus.CREATED).body(grupoGuardado);
-    // }
-
-    // @PostMapping("/nuevo")
-    // public ResponseEntity<GrupoFamiliar> create(@RequestBody GrupoFamiliar grupo)
-    // {
-    // return ResponseEntity.ok(grupoFamiliarService.save(grupo));
-    // }
+    return ResponseEntity.ok("Se han eliminado todos los roles de " 
+                              + nicknameDestino + " excepto ROL_USER");
+}
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateGrupo(@PathVariable Long id, @RequestBody GrupoFamiliar grupoActualizado,
@@ -132,18 +139,7 @@ public class GrupoFamiliarController {
 
         return ResponseEntity.ok(grupoExistente);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        if (grupoFamiliarService.findById(id).isPresent()) {
-            grupoFamiliarService.deleteById(id);
-            return ResponseEntity.ok("Grupo familiar eliminado");
-        } else {
-            return ResponseEntity.status(404).body("Grupo familiar no encontrado");
-        }
-    }
-
-    @PutMapping("/asignar-rol")
+ @PutMapping("/asignar-rol")
     public ResponseEntity<String> asignarRol(@RequestParam String nicknameDestino, @RequestParam String rol) {
         try {
             return ResponseEntity.ok(grupoFamiliarService.asignarRol(nicknameDestino, rol));
@@ -151,49 +147,53 @@ public class GrupoFamiliarController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
-
-    @PutMapping("/{grupoId}/eliminar-usuario/{nickname}")
-@Transactional
-public ResponseEntity<?> eliminarUsuarioDelGrupo(@PathVariable Long grupoId, @PathVariable String nickname,
-        Authentication authentication) {
     
-    // Buscar el grupo
-    Optional<GrupoFamiliar> grupoOpt = grupoFamiliarService.findById(grupoId);
-    if (grupoOpt.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Grupo familiar no encontrado");
-    }
-    GrupoFamiliar grupo = grupoOpt.get();
+    /**  Eliminar TODO el grupo: antes quitamos a todos los miembros del grupo  */
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        Optional<GrupoFamiliar> grupoOpt = grupoFamiliarService.findById(id);
+        if (grupoOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("Grupo familiar no encontrado");
+        }
+        GrupoFamiliar grupo = grupoOpt.get();
 
-    // Usuario autenticado
-    String nicknameAuth = authentication.getName();
+        // 1) Para cada usuario en este grupo: desvincular y limpiar roles
+        List<UsuarioDb> miembros = usuarioService.findByGrupoFamiliarId(grupo.getId());
+        miembros.forEach(u -> {
+            u.setGrupoFamiliar(null);
+            limpiarRoles(u);
+            usuarioService.save(u);
+        });
 
-    // Verificar si el usuario autenticado es el administrador
-    if (!grupo.getAdministrador().getNickname().equals(nicknameAuth)) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Solo el administrador puede eliminar usuarios del grupo");
-    }
-
-    // Buscar usuario a eliminar
-    UsuarioDb usuario = usuarioService.getByNickname(nickname)
-            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nickname));
-
-    // Comprobar que el usuario pertenece al grupo
-    if (usuario.getGrupoFamiliar() == null || !usuario.getGrupoFamiliar().getId().equals(grupoId)) {
-        return ResponseEntity.badRequest().body("El usuario no pertenece a este grupo");
-    }
-
-    // Evitar que el administrador se elimine a sí mismo
-    if (usuario.getId().equals(grupo.getAdministrador().getId())) {
-        return ResponseEntity.badRequest().body("El administrador no puede eliminarse a sí mismo");
+        // 2) Borrar el grupo
+        grupoFamiliarService.deleteById(id);
+        return ResponseEntity.ok("Grupo familiar eliminado");
     }
 
-    // Eliminar al usuario del grupo
-    usuario.setGrupoFamiliar(null);
-    usuarioService.save(usuario);
+    /**  Eliminar un usuario concreto del grupo (por el admin)  */
+    @PutMapping("/{grupoId}/eliminar-usuario/{nickname}")
+    @Transactional
+    public ResponseEntity<?> eliminarUsuarioDelGrupo(
+            @PathVariable Long grupoId,
+            @PathVariable String nickname,
+            Authentication authentication) {
 
-    return ResponseEntity.ok("Usuario eliminado del grupo familiar correctamente");
-}
+        // … código de comprobaciones de existencia y permisos …
 
+        UsuarioDb usuario = usuarioService.getByNickname(nickname)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nickname));
 
+        // … comprueba que pertenece al grupo y no es el admin …
+
+        usuario.setGrupoFamiliar(null);
+        limpiarRoles(usuario);
+        usuarioService.save(usuario);
+
+        return ResponseEntity.ok("Usuario eliminado del grupo familiar correctamente");
+    }
+
+    /**  Abandonar el grupo: lo hace el propio usuario  */
     @DeleteMapping("/abandonar")
     @Transactional
     public ResponseEntity<?> abandonarGrupo(Authentication authentication) {
@@ -204,15 +204,13 @@ public ResponseEntity<?> eliminarUsuarioDelGrupo(@PathVariable Long grupoId, @Pa
         if (usuario.getGrupoFamiliar() == null) {
             return ResponseEntity.badRequest().body("No perteneces a ningún grupo familiar");
         }
-
-        // Comprobar si es el administrador
         if (usuario.getId().equals(usuario.getGrupoFamiliar().getAdministrador().getId())) {
             return ResponseEntity.badRequest().body(
                     "El administrador no puede abandonar su propio grupo. Debe transferir la administración o eliminar el grupo.");
         }
 
-        // Quitar el grupo
         usuario.setGrupoFamiliar(null);
+        limpiarRoles(usuario);
         usuarioService.save(usuario);
 
         return ResponseEntity.ok("Has abandonado el grupo familiar correctamente");

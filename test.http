@@ -214,8 +214,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDUzN
 }
 ###
 ## Eliminar grupo
-DELETE http://localhost:8091/api/grupos/4 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgwMzgwNTksImV4cCI6MTc0ODA3NDA1OX0.kSChLCdBptavFTKjsxQaHwXZzXtUQ1anPPInRoPCPXI
+DELETE http://localhost:8091/api/grupos/6 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgxMTE3MTAsImV4cCI6MTc0ODE0NzcxMH0.qoHTDIFD3nL6GApiWTesFdMV1-utsJHj0A4hIi7fNEI
 
 
 ###
@@ -235,11 +235,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgwMzgxNTksImV4cCI6MTc0ODA3NDE1OX0.AXzFKbgj7tLrzgoq1eJ13FFXX-kwx_TIojIIIGh2NfQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxMTI5MDQsImV4cCI6MTc0ODE0ODkwNH0.gkSagP-mrOXgGcUSou5xBnQZSUXhvKKdIRhSie90pUQ
 
 {
-  "nickname": "sofia2",
-  "grupoId": 6
+  "nickname": "andres",
+  "grupoId": 2
 }
 
 ###
@@ -266,8 +266,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5N
 
 ###
 ### Asignar el rol de padre a un usuario del grupo (solo el admin puede hacerlo)Marcar invitación con ID 5 como aceptada
-PUT http://localhost:8091/api/invitaciones/asignar-rol?nicknameDestino=sofia2&rol=padre HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDU0Mzg1ODAsImV4cCI6MTc0NTQ3NDU4MH0.RKGTRyu1PMudULyTh0hPA4RaxeqfWuoABXhuPgi5fQ8
+PUT http://localhost:8091/api/grupos/asignar-rol?nicknameDestino=andres&rol=PADRE HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxMTM4NjIsImV4cCI6MTc0ODE0OTg2Mn0.MoO4w2PUHOvM7NF16gw0JwkUdMwJp3xjW7ecxSOW97Y
+
+
+###
+### Quitar rol padre
+PUT http://localhost:8091/api/grupos/limpiar-roles?nicknameDestino=andres HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxMTM4NjIsImV4cCI6MTc0ODE0OTg2Mn0.MoO4w2PUHOvM7NF16gw0JwkUdMwJp3xjW7ecxSOW97Y
 
 ###
 ### ARechazar una invitacion
@@ -285,7 +291,7 @@ DELETE http://localhost:8091/api/grupos/abandonar HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDU5NTM4NDQsImV4cCI6MTc0NTk4OTg0NH0.X_1RrolfqQI-IGrZ0VbiIPvZh_siCR4RtJPsVYXhZgg
 
 ###
-### Expulsar al usuario "sofia2" del grupo familiar con ID 1
+### Expulsar al usuario  del grupo familiar con ID 1
 PUT http://localhost:8091/api/grupos/1/eliminar-usuario/sofia2 HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDgwMjMwMzQsImV4cCI6MTc0ODA1OTAzNH0.mdyfGhS-rucjrMF4KJN0Qz6xrmMtHFG8RV-JwXyCTuY
 Content-Type: application/json
@@ -304,7 +310,7 @@ Content-Type: application/json
 ###
 ### Obtener perfil del usuario autenticado
 GET http://localhost:8091/api/usuarios/perfil HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDc3NzUzMTYsImV4cCI6MTc0NzgxMTMxNn0.eTt1EWPmVdLDIiklkIP-134cCx7lWAoBpUh9ycchw4w
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgxMTMwODUsImV4cCI6MTc0ODE0OTA4NX0.qv7BfwgXsza7yGeBUPRnt3ARkYjMKkMrim5-vZ8grD8
 
 
 
