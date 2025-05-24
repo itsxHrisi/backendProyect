@@ -49,7 +49,8 @@ public class UsuarioDb {
 
     @ManyToOne
     @JoinColumn(name = "grupo_familiar_id")
-    @JsonIgnoreProperties
+    @JsonBackReference
+
     private GrupoFamiliar grupoFamiliar;
 
     @NotNull

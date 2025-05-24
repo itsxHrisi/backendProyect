@@ -112,7 +112,18 @@ public ResponseEntity<?> limpiarRolesUsuario(
     return ResponseEntity.ok("Se han eliminado todos los roles de " 
                               + nicknameDestino + " excepto ROL_USER");
 }
-
+ @GetMapping("/{id}/usuarios")
+    public ResponseEntity<?> getUsuariosDelGrupo(@PathVariable Long id) {
+        // 1) Comprobar que existe el grupo
+        Optional<GrupoFamiliar> opt = grupoFamiliarService.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                 .body("Grupo familiar no encontrado");
+        }
+        // 2) Obtener miembros
+        List<UsuarioDb> miembros = usuarioService.findByGrupoFamiliarId(id);
+        return ResponseEntity.ok(miembros);
+    }
     @PutMapping("/{id}")
     public ResponseEntity<?> updateGrupo(@PathVariable Long id, @RequestBody GrupoFamiliar grupoActualizado,
             Authentication authentication) {

@@ -15,4 +15,5 @@ public interface GrupoFamiliarService {
     public String asignarRol(String nicknameDestino, String rolStr);
     public GrupoFamiliar save(GrupoFamiliar grupo);
     public void deleteById(Long id);
+    
 }

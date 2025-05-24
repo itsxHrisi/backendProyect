@@ -31,6 +31,6 @@ public class GrupoFamiliar {
     private UsuarioDb administrador;
 
     @OneToMany(mappedBy = "grupoFamiliar")
-    @JsonIgnoreProperties("grupoFamiliar")
+    @JsonManagedReference
     private List<UsuarioDb> usuarios;
 }
