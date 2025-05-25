@@ -4,9 +4,9 @@ POST http://localhost:8091/auth/nuevo HTTP/1.1
 Content-Type: application/json
 
 {
-    "nickname": "hrisi2",
+    "nickname": "hrisi",
     "nombre": "hristsiyan\nTrayanov",
-    "email": "hristiyantg2@gmail.com",
+    "email": "hristiyantg10@gmail.com",
     "password": "Hrisi231104!",
     "telefono":"722 591 444"
 }
@@ -29,6 +29,100 @@ Content-Type: application/json
     "telefono":"678 591 444"
 
 }
+
+
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "andres2",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristiyantg6@gmail.com",
+    "password": "Hrisi231104!",
+    "telefono":"678 591 444"
+
+}
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "andres8",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristias@gmail.com",
+    "password": "Hrisi231104!",
+    "telefono":"678 591 444"
+
+}
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "anes3",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristiy@gmail.com",
+    "password": "Hrisi231104!",
+    "telefono":"678 591 444"
+
+}
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "and3",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristyantg5@gmail.com",
+    "password": "Hrisi231104!",
+    "telefono":"678 591 444"
+
+}
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "andro3",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristi@gmail.com",
+    "password": "Hrisi231104!",
+    "telefono":"678 591 444"
+
+}
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "andri3",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristiyan@gmail.com",
+    "password": "Hrisi231104!",
+    "telefono":"678 591 444"
+
+}
+
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "andres3",
+    "nombre": "hristsiyan\nTrayanov",
+    "email": "hristiyantg5@gmail.com",
+    "password": "Hrisi231104!",
+    "telefono":"678 591 444"
+
+}
 ###
 ## nuevo correcto
 POST http://localhost:8091/auth/nuevo HTTP/1.1
@@ -41,13 +135,51 @@ Content-Type: application/json
     "password": "Sofia230512!",
     "telefono":"888 888 888"
 }
+
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "sofia",
+    "nombre": "sofia\nTrayanova",
+    "email": "sofiatg2@gmail.com",
+    "password": "Sofia230512!",
+    "telefono":"888 888 888"
+}
+
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "sofia4",
+    "nombre": "sofia\nTrayanova",
+    "email": "sofiat4g@gmail.com",
+    "password": "Sofia230512!",
+    "telefono":"888 888 888"
+}
+###
+## nuevo correcto
+POST http://localhost:8091/auth/nuevo HTTP/1.1
+Content-Type: application/json
+
+{
+    "nickname": "sofia3",
+    "nombre": "sofia\nTrayanova",
+    "email": "sofiat3g@gmail.com",
+    "password": "Sofia230512!",
+    "telefono":"888 888 888"
+}
 ###
 ## login ok PERMISOS ROLE_ADMIN
 POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "nickname": "hrisi2",
+    "nickname": "andri3",
     "password": "Hrisi231104!"
 }
 ###
@@ -65,7 +197,7 @@ POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "nickname": "andres",
+    "nickname": "andres2",
     "password": "Hrisi231104!"
 }
 ###
@@ -235,10 +367,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxMTk2NTksImV4cCI6MTc0ODE1NTY1OX0.uYiuC7ikFLE5VywaXdSNuozx5Y4MbHQmp9KM9cftrjg
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxNzU1MTIsImV4cCI6MTc0ODIxMTUxMn0.THf0QOzIxJhBOlHXrKOmkx6UOMJwp-h0sRzECiCMjCo
 
 {
-  "nickname": "andres",
+  "nickname": "hrisi",
   "grupoId": 2
 }
 
@@ -321,7 +453,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgxM
 ### Obtener todos los usuarios (paginados básicos)
 ###
 GET http://localhost:8091/api/usuarios/usuarios?page=0&size=3&sort=id,desc&sort=id,desc HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2Mzk5MjksImV4cCI6MTc0NjY3NTkyOX0.nbD_cYq0nf9uDIVJpbO-Xn00FqFZsgrAfosfR6WrW_c
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxODE2MDAsImV4cCI6MTc0ODIxNzYwMH0.U1Ev0QNUuAdQTy0lprajCBG12kPDoJ6wC_rhdN4m6Ys
 
 ###Obtener todos los usuarios paginados
 ###
@@ -348,8 +480,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY1N
 }
 ### Obtener usuarios con filtros
 ###
-GET http://localhost:8091/api/usuarios/filter?filter=nombre:CONTIENE:hris&page=0&size=10&sort=id,asc&sort=id,asc HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDA4NDksImV4cCI6MTc0NjY3Njg0OX0.o4N04Wp7ElXIao9bPGmFjvHNCbmpVttcEYeO-mOUjKA
+GET http://localhost:8091/api/usuarios/filter?filter=nickname:IGUAL:hrisi&page=0&size=10&sort=id,asc&sort=id,asc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxODgyNzUsImV4cCI6MTc0ODIyNDI3NX0.jRP4ELuTQ4apu_Kx22lWlJHqVXYfXad5yCWa3wnjp4Y
 
 ### Obtener todos los usuarios paginados
 ### 
