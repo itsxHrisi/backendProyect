@@ -1,17 +1,14 @@
--- =============================================
--- 1️⃣ Eliminar constraints y tablas (orden inverso)
--- =============================================
 
 ALTER TABLE IF EXISTS sesiones_activas         DROP CONSTRAINT IF EXISTS fk_sesiones_usuario; 
 ALTER TABLE IF EXISTS usuarios_roles           DROP CONSTRAINT IF EXISTS fk_usuarios_roles_usuarios;
 ALTER TABLE IF EXISTS usuarios_roles           DROP CONSTRAINT IF EXISTS fk_usuarios_roles_roles;
 ALTER TABLE IF EXISTS GrupoFamiliar            DROP CONSTRAINT IF EXISTS fk_grupo_admin;
-ALTER TABLE IF EXISTS Gasto                    DROP CONSTRAINT IF EXISTS gasto_usuario_id_fkey;
-ALTER TABLE IF EXISTS Gasto                    DROP CONSTRAINT IF EXISTS gasto_grupo_id_fkey;
-ALTER TABLE IF EXISTS Invitacion               DROP CONSTRAINT IF EXISTS invitacion_grupo_id_fkey;
-ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS mensaje_emisor_id_fkey;
-ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS mensaje_receptor_id_fkey;
-ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS mensaje_grupo_id_fkey;
+ALTER TABLE IF EXISTS Gasto                    DROP CONSTRAINT IF EXISTS fk_gasto_usuario;
+ALTER TABLE IF EXISTS Gasto                    DROP CONSTRAINT IF EXISTS fk_gasto_grupo;
+ALTER TABLE IF EXISTS Invitacion               DROP CONSTRAINT IF EXISTS fk_invitacion_grupo;
+ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS fk_mensaje_emisor;
+ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS fk_mensaje_receptor;
+ALTER TABLE IF EXISTS Mensaje                  DROP CONSTRAINT IF EXISTS fk_mensaje_grupo;
 ALTER TABLE IF EXISTS usuarios                 DROP CONSTRAINT IF EXISTS fk_usuarios_grupo_familiar;
 
 DROP TABLE IF EXISTS sesiones_activas;
@@ -19,9 +16,11 @@ DROP TABLE IF EXISTS usuarios_roles;
 DROP TABLE IF EXISTS Gasto;
 DROP TABLE IF EXISTS Invitacion;
 DROP TABLE IF EXISTS Mensaje;
+DROP TABLE IF EXISTS ingresos;        -- ← añadida
 DROP TABLE IF EXISTS SubtipoGasto;
+
+DROP TABLE IF EXISTS GrupoFamiliar;  -- ahora antes de usuarios
 DROP TABLE IF EXISTS usuarios;
-DROP TABLE IF EXISTS GrupoFamiliar;
 DROP TABLE IF EXISTS roles;
 
 -- =============================================
@@ -84,6 +83,21 @@ CREATE TABLE Gasto (
     CONSTRAINT fk_gasto_grupo   FOREIGN KEY (grupo_id)
         REFERENCES GrupoFamiliar(id) ON DELETE CASCADE
 );
+CREATE TABLE ingresos (
+    id BIGSERIAL PRIMARY KEY,
+    usuario_id BIGINT NOT NULL,
+    grupo_id   BIGINT NOT NULL,
+    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cantidad   NUMERIC(12,2) NOT NULL,
+    CONSTRAINT fk_ingreso_usuario
+      FOREIGN KEY (usuario_id)
+      REFERENCES usuarios(id)
+      ON DELETE CASCADE,
+    CONSTRAINT fk_ingreso_grupo
+      FOREIGN KEY (grupo_id)
+      REFERENCES grupofamiliar(id)
+      ON DELETE CASCADE
+);
 
 CREATE TABLE Invitacion (
     id BIGSERIAL PRIMARY KEY,
@@ -135,3 +149,4 @@ INSERT INTO roles(nombre) VALUES
   ('ROL_ADMIN'),
   ('ROL_PADRE'),
   ('ROL_HIJO');
+

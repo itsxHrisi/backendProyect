@@ -174,7 +174,7 @@ Content-Type: application/json
     "telefono":"888 888 888"
 }
 ###
-## login ok PERMISOS ROLE_ADMIN
+## login ok PERMISOS 
 POST http://localhost:8091/auth/login HTTP/1.1
 Content-Type: application/json
 
@@ -256,10 +256,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ## Crear grupo familiar (el usuario será el administrador automáticamente si así lo configuraste)
 POST http://localhost:8091/api/grupos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyZXMiLCJpYXQiOjE3NDgwMzgxNTksImV4cCI6MTc0ODA3NDE1OX0.AXzFKbgj7tLrzgoq1eJ13FFXX-kwx_TIojIIIGh2NfQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxOTU1NTIsImV4cCI6MTc0ODIzMTU1Mn0.tSS_0-k9DUHrSrOI3LqM_1mu9VfmnNJsRNn-ln2IWxc
 
 {
-  "nombre": "Familia Trayanov5"
+  "nombre": "Familia Trayanov"
 }
 ###
 ## Obtener grupo por ID
@@ -367,11 +367,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDYyO
 ### Crear una invitación para un usuario con nickname "sofia2" al grupo 1
 POST http://localhost:8091/api/invitaciones HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxNzU1MTIsImV4cCI6MTc0ODIxMTUxMn0.THf0QOzIxJhBOlHXrKOmkx6UOMJwp-h0sRzECiCMjCo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxOTY3OTQsImV4cCI6MTc0ODIzMjc5NH0.qp5ITzyfdrvn15GxAMkXIigBozp7nlPcvMSCA42v2XE
 
 {
-  "nickname": "hrisi",
-  "grupoId": 2
+  "nickname": "andri3",
+  "grupoId": 1
 }
 
 ###
@@ -385,9 +385,9 @@ GET http://localhost:8091/api/invitaciones HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDc5MzgyMDUsImV4cCI6MTc0Nzk3NDIwNX0.oHrRN8yY93uvKgdOn7r3QLPcOVMzOcmMcicpis_sJT0
 
 ###
-### Marcar invitación con ID 5 como aceptada
+### Marcar invitación con ID 1 como aceptada
 PUT http://localhost:8091/api/invitaciones/1/estado?nuevoEstado=ACEPTADA HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDY0Nzc4MTAsImV4cCI6MTc0NjUxMzgxMH0.YkrvTgwJBkHIdRAAww1Bfo-dB5QMB1Q0kJPlEAoIqwo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyaTMiLCJpYXQiOjE3NDgxOTY4MjMsImV4cCI6MTc0ODIzMjgyM30.rYFA1B3meRXgtbThH9uKdU_ml-xvyBkw-KMyPlHF6es
 
 ###
 ### Obtener todas las invitaciones dirigidas al usuario autenticado
@@ -525,7 +525,46 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2N
 
 
 
-###
-###
+### 
+### Filtrar gastos por nickname del usuario y el nombre del grupo
 GET http://localhost:8091/api/gastos/filter?nicknameDestino:IGUAL:sofia2&filter=grupoNombre:IGUAL:Fam&page=0&size=10&sort=fecha,desc&sort=fecha,desc HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDc2OTAzMjgsImV4cCI6MTc0NzcyNjMyOH0.CprFVHnfSM4ZDBzHpt0Y2RoGRaFdVWIlneMp-tTvcAc
+
+
+### 
+### Crear un ingreso
+POST http://localhost:8091/api/ingresos HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyaTMiLCJpYXQiOjE3NDgxOTY4MjMsImV4cCI6MTc0ODIzMjgyM30.rYFA1B3meRXgtbThH9uKdU_ml-xvyBkw-KMyPlHF6es
+Content-Type: application/json
+
+{
+  "cantidad": "110,56"
+}
+
+
+### 
+### Listar ingresos del grupo del usuario 
+GET http://localhost:8091/api/ingresos?page=0&size=10&sort=id,asc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyaTMiLCJpYXQiOjE3NDgxOTY4MjMsImV4cCI6MTc0ODIzMjgyM30.rYFA1B3meRXgtbThH9uKdU_ml-xvyBkw-KMyPlHF6es
+
+### 
+### Actualizar un ingreso existente (id=5)
+PUT http://localhost:8091/api/ingresos/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxOTQ1MTEsImV4cCI6MTc0ODIzMDUxMX0.Rnf7EUL7PZg4-JIIVsPT-74TQOgjRakWPxQ4zKoKvgo
+Content-Type: application/json
+
+{
+  "cantidad": "2500,00"
+}
+
+### 
+### Eliminar un ingreso existente (id=5)
+DELETE  http://localhost:8091/api/ingresos/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgxOTQ1MTEsImV4cCI6MTc0ODIzMDUxMX0.Rnf7EUL7PZg4-JIIVsPT-74TQOgjRakWPxQ4zKoKvgo
+Content-Type: application/json
+
+### 
+### Listar ingresos del usuario autenticado
+GET http://localhost:8091/api/ingresos/usuario HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyaTMiLCJpYXQiOjE3NDgxOTY4MjMsImV4cCI6MTc0ODIzMjgyM30.rYFA1B3meRXgtbThH9uKdU_ml-xvyBkw-KMyPlHF6es
+
