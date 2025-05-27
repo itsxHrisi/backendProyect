@@ -48,7 +48,12 @@ protected void doFilterInternal(HttpServletRequest req,
                                 HttpServletResponse res,
                                 FilterChain filterChain)
         throws ServletException, IOException {
-
+  String path = req.getServletPath();
+    // Si es registro o login, simplemente lo dejamos pasar sin validar JWT:
+    if (path.startsWith("/auth/nuevo") || path.startsWith("/auth/login")) {
+        filterChain.doFilter(req, res);
+        return;
+    }
     String authHeader = req.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
         filterChain.doFilter(req, res);
