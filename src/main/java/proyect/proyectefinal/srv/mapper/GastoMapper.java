@@ -14,7 +14,8 @@ public interface GastoMapper {
     Gasto gastoEditToGasto(GastoEdit gastoEdit);
 
     GastoEdit gastoToGastoEdit(Gasto gasto);
-
+    
+    @Mapping(target = "usuarioNickname", source = "usuario.nickname")
     GastoInfo gastoToGastoInfo(Gasto gasto);
 
     void updateGastoFromGastoEdit(GastoEdit gastoEdit, @MappingTarget Gasto gasto);

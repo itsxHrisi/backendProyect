@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import proyect.proyectefinal.model.dto.IngresoFilterResponse;
+import proyect.proyectefinal.model.dto.IngresoInfo;
 import proyect.proyectefinal.model.dto.IngresoRequest;
 import proyect.proyectefinal.exception.FiltroException;
 import proyect.proyectefinal.filters.model.PaginaResponse;
@@ -24,6 +26,7 @@ import jakarta.validation.Valid;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -195,5 +198,34 @@ public ResponseEntity<?> actualizarIngreso(
 
 
 
-   
+    @GetMapping("/filter")
+public ResponseEntity<IngresoFilterResponse> filterIngresos(
+    @RequestParam(required=false) String nickname,
+    @RequestParam(required=false) List<String> filter,
+    @RequestParam(defaultValue="0") int page,
+    @RequestParam(defaultValue="10") int size,
+    @RequestParam(defaultValue="fecha,desc") List<String> sort
+) throws FiltroException {
+  List<String> filtros = filter==null ? new ArrayList<>() : new ArrayList<>(filter);
+  if (nickname!=null && !nickname.isBlank()) {
+    UsuarioDb u = usuarioRepository.findByNickname(nickname)
+          .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+    filtros.add("usuario.id:IGUAL:" + u.getId());
+  }
+  PaginaResponse<IngresoInfo> resp = ingresoService.findAll(filtros, page, size, sort);
+    // convertir PaginaResponse<UsuarioInfo> -> IngresoFilterResponse
+    IngresoFilterResponse out = IngresoFilterResponse.builder()
+      .content(resp.getContent())
+      .totalSum(resp.getContent().stream()
+          .map(IngresoInfo::getCantidad)
+          .reduce(BigDecimal.ZERO, BigDecimal::add))
+      .number(resp.getNumber())
+      .size(resp.getSize())
+      .totalElements(resp.getTotalElements())
+      .totalPages(resp.getTotalPages())
+      .appliedFilters(resp.getListaFiltros())
+      .sort(resp.getListaOrdenaciones())
+      .build();
+    return ResponseEntity.ok(out);
+  }
 }

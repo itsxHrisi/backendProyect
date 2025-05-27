@@ -204,14 +204,14 @@ Content-Type: application/json
 ## Crear gasto (asegúrate de usar enums válidos en tipoGasto y subtipo)
 POST http://localhost:8091/api/gastos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDU5MjgsImV4cCI6MTc0NjY4MTkyOH0.x-tNi1ygAGlaNKONLw1PUbjdxPna7Rn8KFDyNRunV_c
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyaTMiLCJpYXQiOjE3NDgyNzUxMzUsImV4cCI6MTc0ODMxMTEzNX0.Ht8szEdEyIyP0XEFydfAVo9ClTPf5Y1SVsGNjuHgi5M
 
 {
   "usuario": { "id": 1 },
   "grupo": { "id": 1 },
   "tipoGasto": "LUJO",
   "subtipo": "ESPECTACULOS",
-  "cantidad": "43,50",
+  "cantidad": "15,50",
   "fecha": "2025-04-06"
 }
 ###
@@ -507,16 +507,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2N
   "sort": ["id,asc"]
 }
 
-### Obtener gastos con filtros
+### Obtener gastos con filtros se filtra por usuario tipo y subtipo
 ###
-GET http://localhost:8091/api/gastos/filter?nickname=hrisi2&filter=tipoGasto:CONTIENE:LUJO&filter=subtipo:IGUAL:ESPECTACULOS&page=0&size=10&sort=fecha,desc&sort=fecha,desc HTTP/1.1
+GET http://localhost:8091/api/gastos/filter?nickname=sofia2&filter=tipoGasto:CONTIENE:LUJO&filter=subtipo:IGUAL:BANKINTER&page=0&size=10&sort=fecha,desc&sort=fecha,desc HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDgzMzgsImV4cCI6MTc0NjY4NDMzOH0.flJ_dLmBVAvvH6n2fYffeAkS6tV2dF7Nrq_eFw32jW8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgyNzU5ODIsImV4cCI6MTc0ODMxMTk4Mn0.Qlni_Fcx2xOFVsc9Vya5OfHoUajGEqM9R8uqaViwPO8
 
 ###
 ###Obtener todos los gastos paginados
 GET http://localhost:8091/api/gastos/page?page=0&size=5&sort=fecha,desc HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJocmlzaTIiLCJpYXQiOjE3NDY2NDgzMzgsImV4cCI6MTc0NjY4NDMzOH0.flJ_dLmBVAvvH6n2fYffeAkS6tV2dF7Nrq_eFw32jW8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgyNzU5ODIsImV4cCI6MTc0ODMxMTk4Mn0.Qlni_Fcx2xOFVsc9Vya5OfHoUajGEqM9R8uqaViwPO8
 
 ###
 ###Obtener gastos filtrados por tipo y subtipo
@@ -568,3 +568,13 @@ Content-Type: application/json
 GET http://localhost:8091/api/ingresos/usuario HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyaTMiLCJpYXQiOjE3NDgxOTY4MjMsImV4cCI6MTc0ODIzMjgyM30.rYFA1B3meRXgtbThH9uKdU_ml-xvyBkw-KMyPlHF6es
 
+
+
+### Listar ingresos filtrados por cantidad > 30 y cantidad > 40 ordenados por fecha descendente
+GET http://localhost:8091/api/ingresos/filter?filter=cantidad:MAYOR_QUE:0&filter=cantidad:MENOR_QUE:9999&page=1&size=5&sort=fecha,desc&sort=fecha,desc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgyODQ1NzYsImV4cCI6MTc0ODMyMDU3Nn0.pUXxgF8SjrehEA2do0RuiVnjXGDSKYZMZZxXTeY4KtY
+
+### Listar ingresos paginados sin filtro
+
+GET http://localhost:8091/api/ingresos/filter?&page=0&size=10&sort=fecha,desc&page=0&size=10&sort=fecha,desc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgyODQ1NzYsImV4cCI6MTc0ODMyMDU3Nn0.pUXxgF8SjrehEA2do0RuiVnjXGDSKYZMZZxXTeY4KtY

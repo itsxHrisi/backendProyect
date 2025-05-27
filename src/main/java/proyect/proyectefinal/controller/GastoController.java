@@ -31,6 +31,7 @@ import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -99,7 +100,7 @@ public class GastoController {
                 .tipoGasto(gastoRequest.getTipoGasto())
                 .subtipo(gastoRequest.getSubtipo())
                 .cantidad(cantidadDecimal)
-                .fecha(gastoRequest.getFecha())
+                .fecha(LocalDate.now())
                 .build();
 
         // 6. Guardar el gasto
@@ -280,62 +281,79 @@ public class GastoController {
         };
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<GastoFilterResponse> filterGastos(
-            @RequestParam String nickname,
-            @RequestParam(required = false) List<String> filter, // tipo:subtipo:value…
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "fecha,desc") List<String> sort) throws FiltroException {
+   @GetMapping("/filter")
+public ResponseEntity<GastoFilterResponse> filterGastos(
+        @RequestParam(required = false) String nickname,              // ahora opcional
+        @RequestParam(required = false) List<String> filter,          // tipo:subtipo:value…
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "fecha,desc") List<String> sort
+) throws FiltroException {
 
-        // 1. Spec para filtrar por usuario.nickname
-        Specification<Gasto> spec = (root, query, cb) -> cb.equal(root.join("usuario").get("nickname"), nickname);
+    // 1. Partimos de un spec vacío
+    Specification<Gasto> spec = Specification.where(null);
 
-        // 2. Si hay filtros extra, los parseamos y añadimos al spec
-        if (filter != null && !filter.isEmpty()) {
-            List<FiltroBusqueda> filtros = filter.stream().map(f -> {
-                String[] p = f.split(":", 3);
-                if (p.length != 3)
-                    throw new IllegalArgumentException("Filtro inválido: " + f);
-                return new FiltroBusqueda(p[0], TipoOperacionBusqueda.valueOf(p[1]), p[2]);
-            }).toList();
-
-            Specification<Gasto> specFiltros = new FiltroBusquedaSpecification<Gasto>(filtros);
-            spec = spec.and(specFiltros);
-        }
-
-        // 3. Construimos el pageable
-        Pageable pageable = PaginationHelper.createPageable(page, size, sort);
-
-        // 4. Ejecutamos la consulta paginada
-        Page<Gasto> pageResult = gastoRepository.findAll(spec, pageable);
-
-        // 5. Mapear y sumar
-        List<GastoInfo> content = pageResult.getContent().stream()
-                .map(GastoMapper.INSTANCE::gastoToGastoInfo)
-                .toList();
-        BigDecimal totalSum = content.stream()
-                .map(GastoInfo::getCantidad)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // 6. Construir respuesta
-        GastoFilterResponse resp = new GastoFilterResponse(
-                content,
-                totalSum,
-                pageResult.getNumber(),
-                pageResult.getSize(),
-                pageResult.getTotalElements(),
-                pageResult.getTotalPages(),
-                filter != null
-                        ? filter.stream().map(f -> {
-                            String[] p = f.split(":", 3);
-                            return new FiltroBusqueda(p[0], TipoOperacionBusqueda.valueOf(p[1]), p[2]);
-                        }).toList()
-                        : List.of(),
-                sort);
-        return ResponseEntity.ok(resp);
+    // 2. Si nos dieron nickname, añadimos esa condición
+    if (nickname != null && !nickname.isBlank()) {
+        spec = spec.and((root, query, cb) ->
+            cb.equal(root.join("usuario").get("nickname"), nickname)
+        );
     }
 
+    // 3. Si hay filtros extra (tipo, subtipo, etc.), los parseamos y los añadimos
+    if (filter != null && !filter.isEmpty()) {
+        List<FiltroBusqueda> filtros = filter.stream().map(f -> {
+            String[] p = f.split(":", 3);
+            if (p.length != 3)
+                throw new IllegalArgumentException("Filtro inválido: " + f);
+            return new FiltroBusqueda(
+                p[0],
+                TipoOperacionBusqueda.valueOf(p[1]),
+                p[2]
+            );
+        }).toList();
+
+        Specification<Gasto> specFiltros = new FiltroBusquedaSpecification<>(filtros);
+        spec = spec.and(specFiltros);
+    }
+
+    // 4. Creamos el pageable
+    Pageable pageable = PaginationHelper.createPageable(page, size, sort);
+
+    // 5. Ejecutamos
+    Page<Gasto> pageResult = gastoRepository.findAll(spec, pageable);
+
+    // 6. Mapeo + suma
+    List<GastoInfo> content = pageResult.getContent().stream()
+        .map(GastoMapper.INSTANCE::gastoToGastoInfo)
+        .toList();
+
+    BigDecimal totalSum = content.stream()
+        .map(GastoInfo::getCantidad)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // 7. Construimos la respuesta
+    GastoFilterResponse resp = new GastoFilterResponse(
+        content,
+        totalSum,
+        pageResult.getNumber(),
+        pageResult.getSize(),
+        pageResult.getTotalElements(),
+        pageResult.getTotalPages(),
+        filter != null
+            ? filter.stream().map(f -> {
+                String[] p = f.split(":", 3);
+                return new FiltroBusqueda(
+                    p[0],
+                    TipoOperacionBusqueda.valueOf(p[1]),
+                    p[2]
+                );
+            }).toList()
+            : List.of(),
+        sort
+    );
+    return ResponseEntity.ok(resp);
+}
     @GetMapping("/page")
     public ResponseEntity<Page<GastoInfo>> getGastosPaginados(
             @RequestParam(defaultValue = "0") int page,
@@ -364,7 +382,7 @@ public class GastoController {
     
         // 4) Mapear a DTO
         Page<GastoInfo> dtoPage = pageGastos.map(GastoMapper.INSTANCE::gastoToGastoInfo);
-    
+        
         return ResponseEntity.ok(dtoPage);
     }
     
