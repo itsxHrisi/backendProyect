@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.war app.war
 
 # Expone el puerto por defecto de Spring Boot
-EXPOSE 8080
+EXPOSE 8091
 
 # Ejecuta la app
 ENTRYPOINT ["java", "-jar", "app.war"]
