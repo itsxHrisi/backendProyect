@@ -506,8 +506,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmRyaTMiLCJpYXQiOjE3NDgxO
 
 
 ### Listar ingresos filtrados por cantidad > 30 y cantidad > 40 ordenados por fecha descendente
-GET http://localhost:8091/api/ingresos/filter?filter=cantidad:MAYOR_QUE:0&filter=cantidad:MENOR_QUE:9999&page=1&size=5&sort=fecha,desc&sort=fecha,desc HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDgyODQ1NzYsImV4cCI6MTc0ODMyMDU3Nn0.pUXxgF8SjrehEA2do0RuiVnjXGDSKYZMZZxXTeY4KtY
+GET http://localhost:8091/api/ingresos/filter?filter=cantidad:MAYOR_QUE:0&filter=cantidad:MENOR_QUE:9999&page=0&size=5&sort=fecha,desc&sort=fecha,desc HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzb2ZpYTIiLCJpYXQiOjE3NDg0ODAxMDcsImV4cCI6MTc0ODUxNjEwN30.zp2wcanuC-lKchlxumSlRcNVdNBqQBxetdAEWg1gf50
 
 ### Listar ingresos paginados sin filtro
 

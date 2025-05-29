@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import proyect.proyectefinal.exception.FiltroException;
@@ -280,59 +281,62 @@ public class GastoController {
                     .contains(subtipo);
         };
     }
-
-   @GetMapping("/filter")
+@GetMapping("/filter")
 public ResponseEntity<GastoFilterResponse> filterGastos(
-        @RequestParam(required = false) String nickname,              // ahora opcional
-        @RequestParam(required = false) List<String> filter,          // tipo:subtipo:value…
+        @RequestParam(required = false) String nickname,              
+        @RequestParam(required = false) List<String> filter,          
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(defaultValue = "fecha,desc") List<String> sort
 ) throws FiltroException {
 
-    // 1. Partimos de un spec vacío
+    // 0️⃣ Obtener usuario autenticado y su grupo
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String nickAuth = auth.getName();
+    UsuarioDb usuario = usuarioRepository.findByNickname(nickAuth)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario no autenticado"));
+    Long grupoId = usuario.getGrupoFamiliar().getId();
+
+    // 1️⃣ Arrancamos spec vacío
     Specification<Gasto> spec = Specification.where(null);
 
-    // 2. Si nos dieron nickname, añadimos esa condición
+    // 2️⃣ Filtrar siempre por grupo
+    spec = spec.and((root, query, cb) ->
+        cb.equal(root.join("grupo").get("id"), grupoId)
+    );
+
+    // 3️⃣ Si nos dieron nickname, añadimos esa condición
     if (nickname != null && !nickname.isBlank()) {
         spec = spec.and((root, query, cb) ->
             cb.equal(root.join("usuario").get("nickname"), nickname)
         );
     }
 
-    // 3. Si hay filtros extra (tipo, subtipo, etc.), los parseamos y los añadimos
+    // 4️⃣ Filtros extra (tipo, subtipo, cantidad…)
     if (filter != null && !filter.isEmpty()) {
         List<FiltroBusqueda> filtros = filter.stream().map(f -> {
             String[] p = f.split(":", 3);
-            if (p.length != 3)
-                throw new IllegalArgumentException("Filtro inválido: " + f);
-            return new FiltroBusqueda(
-                p[0],
-                TipoOperacionBusqueda.valueOf(p[1]),
-                p[2]
-            );
+            if (p.length != 3) throw new IllegalArgumentException("Filtro inválido: " + f);
+            return new FiltroBusqueda(p[0], TipoOperacionBusqueda.valueOf(p[1]), p[2]);
         }).toList();
-
-        Specification<Gasto> specFiltros = new FiltroBusquedaSpecification<>(filtros);
-        spec = spec.and(specFiltros);
+        spec = spec.and(new FiltroBusquedaSpecification<>(filtros));
     }
 
-    // 4. Creamos el pageable
+    // 5️⃣ Paginación y orden
     Pageable pageable = PaginationHelper.createPageable(page, size, sort);
 
-    // 5. Ejecutamos
+    // 6️⃣ Ejecutar consulta
     Page<Gasto> pageResult = gastoRepository.findAll(spec, pageable);
 
-    // 6. Mapeo + suma
+    // 7️⃣ Mapeo a DTO y suma
     List<GastoInfo> content = pageResult.getContent().stream()
         .map(GastoMapper.INSTANCE::gastoToGastoInfo)
         .toList();
-
     BigDecimal totalSum = content.stream()
         .map(GastoInfo::getCantidad)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    // 7. Construimos la respuesta
+    // 8️⃣ Construir respuesta
     GastoFilterResponse resp = new GastoFilterResponse(
         content,
         totalSum,
@@ -343,17 +347,15 @@ public ResponseEntity<GastoFilterResponse> filterGastos(
         filter != null
             ? filter.stream().map(f -> {
                 String[] p = f.split(":", 3);
-                return new FiltroBusqueda(
-                    p[0],
-                    TipoOperacionBusqueda.valueOf(p[1]),
-                    p[2]
-                );
+                return new FiltroBusqueda(p[0], TipoOperacionBusqueda.valueOf(p[1]), p[2]);
             }).toList()
             : List.of(),
         sort
     );
+
     return ResponseEntity.ok(resp);
 }
+
     @GetMapping("/page")
     public ResponseEntity<Page<GastoInfo>> getGastosPaginados(
             @RequestParam(defaultValue = "0") int page,

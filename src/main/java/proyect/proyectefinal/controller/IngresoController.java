@@ -1,6 +1,9 @@
 package proyect.proyectefinal.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,7 +16,11 @@ import proyect.proyectefinal.model.dto.IngresoFilterResponse;
 import proyect.proyectefinal.model.dto.IngresoInfo;
 import proyect.proyectefinal.model.dto.IngresoRequest;
 import proyect.proyectefinal.exception.FiltroException;
+import proyect.proyectefinal.filters.model.FiltroBusqueda;
 import proyect.proyectefinal.filters.model.PaginaResponse;
+import proyect.proyectefinal.filters.model.TipoOperacionBusqueda;
+import proyect.proyectefinal.filters.specification.FiltroBusquedaSpecification;
+import proyect.proyectefinal.helper.PaginationHelper;
 import proyect.proyectefinal.model.db.GrupoFamiliar;
 import proyect.proyectefinal.model.db.IngresoDb;
 import proyect.proyectefinal.model.db.UsuarioDb;
@@ -21,7 +28,7 @@ import proyect.proyectefinal.repository.IngresoRepository;
 import proyect.proyectefinal.repository.UsuarioRepository;
 import proyect.proyectefinal.service.GrupoFamiliarService;
 import proyect.proyectefinal.service.IngresoService;
-
+import proyect.proyectefinal.srv.mapper.IngresoMapper;
 import jakarta.validation.Valid;
 
 import java.math.BigDecimal;
@@ -200,32 +207,80 @@ public ResponseEntity<?> actualizarIngreso(
 
     @GetMapping("/filter")
 public ResponseEntity<IngresoFilterResponse> filterIngresos(
-    @RequestParam(required=false) String nickname,
-    @RequestParam(required=false) List<String> filter,
-    @RequestParam(defaultValue="0") int page,
-    @RequestParam(defaultValue="10") int size,
-    @RequestParam(defaultValue="fecha,desc") List<String> sort
+    @RequestParam(required = false) String nickname,
+    @RequestParam(required = false) List<String> filter,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "10") int size,
+    @RequestParam(defaultValue = "fecha,desc") List<String> sort
 ) throws FiltroException {
-  List<String> filtros = filter==null ? new ArrayList<>() : new ArrayList<>(filter);
-  if (nickname!=null && !nickname.isBlank()) {
-    UsuarioDb u = usuarioRepository.findByNickname(nickname)
-          .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-    filtros.add("usuario.id:IGUAL:" + u.getId());
-  }
-  PaginaResponse<IngresoInfo> resp = ingresoService.findAll(filtros, page, size, sort);
-    // convertir PaginaResponse<UsuarioInfo> -> IngresoFilterResponse
-    IngresoFilterResponse out = IngresoFilterResponse.builder()
-      .content(resp.getContent())
-      .totalSum(resp.getContent().stream()
-          .map(IngresoInfo::getCantidad)
-          .reduce(BigDecimal.ZERO, BigDecimal::add))
-      .number(resp.getNumber())
-      .size(resp.getSize())
-      .totalElements(resp.getTotalElements())
-      .totalPages(resp.getTotalPages())
-      .appliedFilters(resp.getListaFiltros())
-      .sort(resp.getListaOrdenaciones())
-      .build();
-    return ResponseEntity.ok(out);
-  }
+    // 0️⃣ Usuario autenticado y su grupo
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String nickAuth = auth.getName();
+    UsuarioDb usuario = usuarioRepository.findByNickname(nickAuth)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario no autenticado"));
+    Long grupoId = usuario.getGrupoFamiliar().getId();
+
+    // 1️⃣ Arrancamos spec vacío
+    Specification<IngresoDb> spec = Specification.where(null);
+
+    // 2️⃣ Filtrar siempre por grupo
+    spec = spec.and((root, query, cb) ->
+        cb.equal(root.join("grupo").get("id"), grupoId)
+    );
+
+    // 3️⃣ Si nos dieron nickname, añadimos esa condición
+    if (nickname != null && !nickname.isBlank()) {
+        spec = spec.and((root, query, cb) ->
+            cb.equal(root.join("usuario").get("nickname"), nickname)
+        );
+    }
+
+    // 4️⃣ Filtros extra (cantidad, fecha, etc.)
+    if (filter != null && !filter.isEmpty()) {
+        List<FiltroBusqueda> filtros = filter.stream().map(f -> {
+            String[] p = f.split(":", 3);
+            if (p.length != 3) throw new IllegalArgumentException("Filtro inválido: " + f);
+            return new FiltroBusqueda(
+                p[0],
+                TipoOperacionBusqueda.valueOf(p[1]),
+                p[2]
+            );
+        }).toList();
+        spec = spec.and(new FiltroBusquedaSpecification<>(filtros));
+    }
+
+    // 5️⃣ Paginación y orden
+    Pageable pageable = PaginationHelper.createPageable(page, size, sort);
+
+    // 6️⃣ Ejecutar consulta
+    Page<IngresoDb> pageResult = ingresoRepository.findAll(spec, pageable);
+
+    // 7️⃣ Mapeo a DTO y suma
+    List<IngresoInfo> content = pageResult.getContent().stream()
+        .map(IngresoMapper.INSTANCE::ingresoToIngresoInfo)
+        .toList();
+    BigDecimal totalSum = content.stream()
+        .map(IngresoInfo::getCantidad)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // 8️⃣ Construir respuesta
+    IngresoFilterResponse resp = IngresoFilterResponse.builder()
+        .content(content)
+        .totalSum(totalSum)
+        .number(pageResult.getNumber())
+        .size(pageResult.getSize())
+        .totalElements(pageResult.getTotalElements())
+        .totalPages(pageResult.getTotalPages())
+        .appliedFilters(filter != null
+            ? filter.stream().map(f -> {
+                String[] p = f.split(":", 3);
+                return new FiltroBusqueda(p[0], TipoOperacionBusqueda.valueOf(p[1]), p[2]);
+              }).toList()
+            : List.of())
+        .sort(sort)
+        .build();
+
+    return ResponseEntity.ok(resp);
+}
+
 }
