@@ -23,7 +23,7 @@ services:
     depends_on:
       - proyecto-db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://135.225.90.208:5432/proyectoFinal
+      SPRING_DATASOURCE_URL: jdbc:postgresql://proyecto-db:5432/proyectoFinal
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin
     ports:
