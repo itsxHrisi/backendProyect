@@ -75,9 +75,15 @@ public class SecurityConfig {
     CorsConfigurationSource CorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Configurar desde donde se puede invocar a la API
-        configuration.setAllowedOrigins(List.of("http://localhost:8005", "http://localhost:4200"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT")); // Que métodos pueden utilizarse
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        //configuration.setAllowedOrigins(List.of("http://localhost:8005", "http://localhost:4200"));
+        configuration.setAllowedOriginPatterns(List.of("https://frontend-service-361428223041.europe-southwest1.run.app"));
+        //configuration.setAllowedOriginPatterns(List.of("*"));
+        
+        //configuration.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT")); // Que métodos pueden utilizarse
+        configuration.setAllowedMethods(List.of("*")); // Que métodos pueden utilizarse
+        
+        //configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

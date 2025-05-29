@@ -1,14 +1,31 @@
-# Usa una imagen base de Java
-FROM openjdk:17-jdk-slim
+# Etapa 1: Construcción con Maven
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
-# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia el archivo .jar generado en la construcción de la aplicación
-COPY target/proyectefinal-0.0.1-SNAPSHOT.war proyectefinal.war
+# Copia pom.xml y descarga dependencias
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Expone el puerto en el que se ejecutará la aplicación
-EXPOSE 8091
+# Copia el resto del proyecto
+COPY . .
 
-# Comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "proyectefinal.war"]
+# Compila el proyecto (genera un .jar en /app/target)
+RUN mvn clean package -DskipTests
+
+RUN ls -l /app/target
+
+# Etapa 2: Imagen final más liviana
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+# Copia el JAR compilado
+COPY --from=build /app/target/*.war app.war
+
+# Expone el puerto por defecto de Spring Boot
+EXPOSE 8080
+
+# Ejecuta la app
+ENTRYPOINT ["java", "-jar", "app.war"]
+
